@@ -5,8 +5,10 @@ enum Language {
     case english
     
     static var current: Language {
-        let langCode = Locale.current.language.languageCode?.identifier ?? "en"
-        return langCode == "ja" ? .japanese : .english
+        // CFBundleLocalizationsが未設定の場合、Locale.currentがenになることがあるため
+        // ユーザーの優先言語設定（preferredLanguages）を確認する
+        let preferred = Locale.preferredLanguages.first ?? "en"
+        return preferred.hasPrefix("ja") ? .japanese : .english
     }
 }
 
