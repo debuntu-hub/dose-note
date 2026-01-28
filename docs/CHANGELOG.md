@@ -55,6 +55,14 @@
   - GitHub push実行には、リポジトリ作成とリモート設定が必要
   - CEO_DASHBOARDに次アクションを記載
 
+- `[システム]` GitHub CLI導入・リポジトリ公開完了
+  - CEO判断（DEC-2026-01-29-04）に基づきGitHub CLIを導入
+  - `brew install gh` でインストール
+  - `gh auth login` でCEO認証完了
+  - `gh repo create` でリポジトリ作成・リモート設定・pushを一括実行
+  - リポジトリURL: https://github.com/debuntu-hub/dose-note
+  - 公開設定: Public
+
 ### 2026-01-28
 
 - `[システム]` 会社OS仕様書に基づく文書管理体制を初期化
