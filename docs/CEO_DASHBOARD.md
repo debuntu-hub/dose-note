@@ -70,8 +70,8 @@
   - 5.5インチ (iPhone 8 Plus等)
 
 **Task 503: アーカイブ作成 (CEO)**
-- [ ] Xcode > Product > Archive を実行
-- [ ] Organizerから "Distribute App" -> "TestFlight & App Store" へアップロード
+- [完了 ] Xcode > Product > Archive を実行
+- [完了 ] Organizerから "Distribute App" -> "TestFlight & App Store" へアップロード
 
 **完了済みGate**:
 - ✅ Gate A（PRD）: 1/28達成
