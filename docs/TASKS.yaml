@@ -1,53 +1,88 @@
 # WBS (Work Breakdown Structure)
-# プロジェクト: [未定義]
+# プロジェクト: Dose Note
 # 作成日: 2026-01-28
-# 最終更新: 2026-01-28
+# 最終更新: 2026-01-29
 
 project:
-  name: "[未定義]"
-  status: "INITIAL_SETUP"
-  start_date: null
+  name: "Dose Note"
+  status: "TESTING"
+  start_date: "2026-01-28"
   target_release: null
 
 phases:
   - id: "phase_1"
     name: "企画"
-    status: "not_started"
+    status: "completed"
     gate: "Gate A (PRD)"
-    tasks: []
+    tasks:
+      - id: "task_101"
+        title: "PRD作成"
+        status: "completed"
+        assignee: "AI/CEO"
+        notes: "Gate A達成"
 
   - id: "phase_2"
     name: "仕様策定"
-    status: "not_started"
+    status: "completed"
     gate: "Gate B (SRS)"
     dependencies: ["phase_1"]
-    tasks: []
+    tasks:
+      - id: "task_201"
+        title: "SRS作成"
+        status: "completed"
+        assignee: "AI/CEO"
+        notes: "Gate B達成"
 
   - id: "phase_3"
     name: "実装"
-    status: "not_started"
+    status: "completed"
     gate: "Gate C (実装)"
     dependencies: ["phase_2"]
-    tasks: []
+    tasks:
+      - id: "task_301"
+        title: "SwiftUI実装"
+        status: "completed"
+        assignee: "AI"
+        notes: "9機能実装完了"
+      - id: "task_302"
+        title: "Gate C検証"
+        status: "completed"
+        assignee: "AI"
+        notes: "DEC-2026-01-29-03により達成"
 
   - id: "phase_4"
     name: "テスト"
-    status: "not_started"
+    status: "in_progress"
     dependencies: ["phase_3"]
-    tasks: []
+    tasks:
+      - id: "task_401"
+        title: "基本機能テスト（記録・表示）"
+        status: "not_started"
+        assignee: "CEO"
+        notes: "SC-01, F-01, F-02の確認"
+      - id: "task_402"
+        title: "Free/Premium境界テスト"
+        status: "not_started"
+        assignee: "CEO"
+        notes: "ロック機能、30日制限の確認"
+      - id: "task_403"
+        title: "履歴・編集機能テスト"
+        status: "not_started"
+        assignee: "CEO"
+        notes: "SC-02, SC-03, F-05, F-07の確認"
+      - id: "task_404"
+        title: "データ永続化テスト"
+        status: "not_started"
+        assignee: "CEO"
+        notes: "再起動後のデータ保持確認"
+      - id: "task_405"
+        title: "エッジケース検証"
+        status: "not_started"
+        assignee: "CEO"
+        notes: "0件、1件（DEC-02対応）時の挙動確認"
 
   - id: "phase_5"
     name: "リリース"
     status: "not_started"
     dependencies: ["phase_4"]
     tasks: []
-
-# タスク追加時のテンプレート:
-# - id: "task_001"
-#   title: "タスク名"
-#   status: "not_started"  # not_started | in_progress | completed | blocked
-#   assignee: "AI" or "CEO"
-#   estimated_hours: 0
-#   actual_hours: 0
-#   dependencies: []
-#   notes: ""
