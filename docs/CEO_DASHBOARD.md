@@ -84,6 +84,12 @@
 - [ ] 売却準備開始
 - [ ] 売却実行
 
+### 🔍 Exit 最終チェック
+- [ ] デューデリチェック完了（[EXIT_DUE_DILIGENCE.md](./EXIT_DUE_DILIGENCE.md)）
+- [ ] アプリ説明パッケージ生成済み（[EXIT_PACKAGE_SPEC.md](./EXIT_PACKAGE_SPEC.md)）
+- [ ] 想定売却価格に納得している
+- [ ] 売却 or 継続 の判断完了
+
 ---
 
 ## 🛑 停止・資産化ステータス
