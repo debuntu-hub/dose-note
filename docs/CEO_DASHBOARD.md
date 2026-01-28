@@ -48,6 +48,22 @@
 
 ## ⚠️ 今すぐ判断すべきこと
 
+### 【確認】仕様変更：FCF入力・集計の半自動化
+- [ ] 確認済み（DEC-2026-01-29-06）
+- FCF管理を半自動化するシステムを構築しました
+- 月1回、`data/fcf_input.csv` に1行追記 + AI指示で完結します（5分）
+
+**新規作成**:
+- [data/fcf_input.csv](../data/fcf_input.csv) - 入力原本
+- [data/README.md](../data/README.md) - 入力ガイド
+- [FCF_REPORT.md](./FCF_REPORT.md) - 自動生成レポート
+
+**更新**:
+- [会社OS.md](./会社OS.md) - 第13.5-13.7章（自動化ルール・アプリ別判断ルール）
+- CEO_DASHBOARD.md - アプリ別FCF表示
+
+---
+
 ### 【確認】仕様変更：FCF組み込み
 - [x] 確認済み（DEC-2026-01-29-05）
 - 会社OS・PRD・SRS・DECISIONS・CEO_DASHBOARD に FCF（フリーキャッシュフロー）方針を組み込みました
