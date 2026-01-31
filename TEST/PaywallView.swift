@@ -105,8 +105,8 @@ struct PaywallView: View {
                             .multilineTextAlignment(.center)
                             
                         HStack(spacing: 20) {
-                            Link("Terms".localized, destination: URL(string: "https://example.com/terms")!)
-                            Link("Privacy".localized, destination: URL(string: "https://example.com/privacy")!)
+                            Link("Terms".localized, destination: URL(string: "https://github.com/debuntu-hub/dose-note/blob/main/docs/TERMS.md")!)
+                            Link("Privacy".localized, destination: URL(string: "https://github.com/debuntu-hub/dose-note/blob/main/docs/PRIVACY.md")!)
                         }
                         .font(.caption)
                         .padding(.top, 5)
@@ -138,31 +138,6 @@ struct PaywallView: View {
                         }
                         .font(.caption)
                     }
-                    
-                    // DEBUG BUTTONS
-#if DEBUG
-                    VStack(spacing: 12) {
-                        Button("【デバッグ】無料でアンロック") {
-                            storeManager.debugUnlock()
-                        }
-                        
-                        if let store = store {
-                            Button("【デバッグ】ダミーデータ生成") {
-                                store.createDummyData()
-                            }
-                            Button("【デバッグ】データ全消去") {
-                                store.clearData()
-                            }
-                            .foregroundStyle(.red)
-                        } else {
-                            Text("Store not connected")
-                                .font(.caption2)
-                                .foregroundStyle(.red)
-                        }
-                    }
-                    .padding(.top)
-                    .font(.caption)
-#endif
                 }
                 .padding(.bottom, 20)
             }
