@@ -105,13 +105,6 @@ class StoreManager: ObservableObject {
             return safe
         }
     }
-    
-    // MARK: - Mock for Testing (Optional)
-#if DEBUG
-    func debugUnlock() {
-        isPremium = true
-    }
-#endif
 }
 
 enum StoreError: Error {

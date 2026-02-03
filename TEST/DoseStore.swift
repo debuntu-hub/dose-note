@@ -118,41 +118,6 @@ final class DoseStore: ObservableObject {
         return points
     }
     
-    // MARK: - Debug
-    
-#if DEBUG
-    func createDummyData() {
-        var dummyDoses: [Dose] = []
-        let calendar = Calendar.current
-        let now = Date()
-        
-        // Generate past 3 months of data
-        for dayOffset in 0..<90 {
-            // Randomly decide to skip days (simulate irregular intake)
-            if Int.random(in: 0...2) == 0 {
-                continue
-            }
-            
-            if let date = calendar.date(byAdding: .day, value: -dayOffset, to: now) {
-                // Random time during the day
-                let hour = Int.random(in: 8...22)
-                let minute = Int.random(in: 0...59)
-                
-                if let doseDate = calendar.date(bySettingHour: hour, minute: minute, second: 0, of: date) {
-                    dummyDoses.append(Dose(id: UUID(), date: doseDate))
-                }
-            }
-        }
-        
-        // Replace current data with dummy data sorted descending
-        self.doses = dummyDoses.sorted(by: { $0.date > $1.date })
-    }
-    
-    func clearData() {
-        self.doses = []
-    }
-#endif
-    
     // MARK: - Persistence
     
     private func save() {
