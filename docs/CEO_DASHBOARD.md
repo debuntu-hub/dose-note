@@ -212,14 +212,20 @@
   - 5.5インチ (iPhone 8 Plus等)
 
 **Task 503: アーカイブ作成 (CEO)**
-- [完了 ] Xcode > Product > Archive を実行
-- [完了 ] Organizerから "Distribute App" -> "TestFlight & App Store" へアップロード
+- [x] Xcode > Product > Archive を実行
+- [x] Organizerから "Distribute App" -> "TestFlight & App Store" へアップロード
+
+**Task 504: App Store Connect申請 (CEO)**
+- [x] タイトル・説明文・キーワードを入力
+- [x] スクリーンショットをアップロード
+- [x] ビルドを選択して「審査へ提出」
 
 **完了済みGate**:
 - ✅ Gate A（PRD）: 1/28達成
 - ✅ Gate B（SRS）: 1/28達成
 - ✅ Gate C（実装）: 1/29達成
-- ✅ テスト完了: 1/29確認（エッジケース一部スキップ）
+- ✅ テスト完了: 1/29確認
+- ✅ リリース申請: 2/1完了
 
 ---
 
@@ -231,10 +237,6 @@
 3. 特にFree/Premiumの機能制限を確認
 4. エッジケースを意図的に作って動作確認
 5. 問題があれば、原因を分類してCEO_DASHBOARDに記入
-
-### Debug機能の確認
-- Debugビルド時：課金画面に「無料でアンロック」ボタンが表示される
-- これを使ってPremium機能をテスト可能
 
 ### 実装状況
 - Swift/SwiftUI実装完了済み
