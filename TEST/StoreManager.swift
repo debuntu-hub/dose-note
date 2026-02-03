@@ -86,7 +86,7 @@ class StoreManager: ObservableObject {
     
     private func requestProducts() async {
         do {
-            let storeProducts = try await Product.products(for: productDict.keys)
+            let storeProducts = try await Product.products(for: productDict.values)
             // Sort by price for display
             products = storeProducts.sorted(by: { $0.price < $1.price })
         } catch {
