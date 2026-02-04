@@ -101,3 +101,8 @@ phases:
         status: "not_started"
         assignee: "CEO"
         notes: "Xcode > Product > Archive"
+      - id: "task_505"
+        title: "緊急バグ修正：サブスクリプション有効化不具合"
+        status: "completed"
+        assignee: "AI"
+        notes: "StoreManagerのリスナー追加と共有インスタンス化修正"
