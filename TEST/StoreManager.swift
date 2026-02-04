@@ -8,6 +8,7 @@ class StoreManager: ObservableObject {
     @Published var isPremium: Bool = false
     @Published var products: [Product] = []
     @Published var errorMessage: String? = nil
+    @Published var isPurchasing: Bool = false
     
     // Product IDs (Must match App Store Connect)
     private let productDict: [String: String]
@@ -55,25 +56,42 @@ class StoreManager: ObservableObject {
     
     // MARK: - Purchasing
     
-    func purchase(_ product: Product) async throws {
-        let result = try await product.purchase()
+    func// Prevent multiple simultaneous purchase attempts
+        guard !isPurchasing else { return }
         
-        switch result {
-        case .success(let verification):
-            // Check if the transaction is verified
-            let transaction = try checkVerified(verification)
+        isPurchasing = true
+        errorMessage = nil
+        
+        // Ensure isPurchasing is reset after the function returns (even if it throws)
+        defer {
+            isPurchasing = false
+        }
+        
+        do {
+            let result = try await product.purchase()
             
-            // The transaction is verified. Deliver content to the user.
-            await updateCustomerProductStatus()
-            
-            // Always finish a transaction.
-            await transaction.finish()
-            
-        case .userCancelled:
-            break
-        case .pending:
-            break
-        @unknown default:
+            switch result {
+            case .success(let verification):
+                // Check if the transaction is verified
+                let transaction = try checkVerified(verification)
+                
+                // The transaction is verified. Deliver content to the user.
+                await updateCustomerProductStatus()
+                
+                // Always finish a transaction.
+                await transaction.finish()
+                
+            case .userCancelled:
+                break
+            case .pending:
+                break
+            @unknown default:
+                break
+            }
+        } catch {
+            // Update error message so the View can display it
+            self.errorMessage = error.localizedDescription
+            throw errordefault:
             break
         }
     }

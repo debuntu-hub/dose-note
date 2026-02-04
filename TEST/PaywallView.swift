@@ -2,7 +2,7 @@ import SwiftUI
 import StoreKit
 
 struct PaywallView: View {
-    @ObservedObject var storeManager: StoreManager
+    @EnvironmentObject var storeManager: StoreManager
     var store: DoseStore?
     @Environment(\.dismiss) var dismiss
     
@@ -77,7 +77,12 @@ struct PaywallView: View {
                     ForEach(storeManager.products) { product in
                         Button(action: {
                             Task {
-                                try? await storeManager.purchase(product)
+                                do {
+                                    try await storeManager.purchase(product)
+                                } catch {
+                                    // Error is handled in StoreManager and exposed via errorMessage
+                                    print("Purchase failed: \(error.localizedDescription)")
+                                }
                             }
                         }) {
                             HStack {
@@ -89,8 +94,13 @@ struct PaywallView: View {
                                         .foregroundStyle(.secondary)
                                 }
                                 Spacer()
-                                Text(product.displayPrice)
-                                    .fontWeight(.bold)
+                                
+                                if storeManager.isPurchasing {
+                                    ProgressView()
+                                } else {
+                                    Text(product.displayPrice)
+                                        .fontWeight(.bold)
+                                }
                             }
                             .padding()
                             .background(Color(UIColor.secondarySystemBackground))
@@ -100,6 +110,7 @@ struct PaywallView: View {
                                     .stroke(Color.blue, lineWidth: 2)
                             )
                         }
+                        .disabled(storeManager.isPurchasing)
                         .padding(.horizontal)
                     }
                 }

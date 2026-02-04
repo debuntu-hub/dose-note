@@ -199,7 +199,7 @@ struct ContentView: View {
                 }
             }
             .sheet(isPresented: $showingPaywall) {
-                PaywallView(storeManager: storeManager, store: store)
+                PaywallView(store: store)
             }
         }
     }
@@ -308,7 +308,7 @@ struct HistoryView: View {
         }
         .navigationTitle("History View Title".localized)
         .sheet(isPresented: $showingPaywall) {
-            PaywallView(storeManager: storeManager, store: store)
+            PaywallView(store: store)
         }
     }
 }
