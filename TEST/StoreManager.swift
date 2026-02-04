@@ -56,7 +56,8 @@ class StoreManager: ObservableObject {
     
     // MARK: - Purchasing
     
-    func// Prevent multiple simultaneous purchase attempts
+    func purchase(_ product: Product) async throws {
+        // Prevent multiple simultaneous purchase attempts
         guard !isPurchasing else { return }
         
         isPurchasing = true
@@ -91,8 +92,7 @@ class StoreManager: ObservableObject {
         } catch {
             // Update error message so the View can display it
             self.errorMessage = error.localizedDescription
-            throw errordefault:
-            break
+            throw error
         }
     }
     
