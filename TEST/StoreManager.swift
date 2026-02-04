@@ -7,6 +7,7 @@ import Combine
 class StoreManager: ObservableObject {
     @Published var isPremium: Bool = false
     @Published var products: [Product] = []
+    @Published var errorMessage: String? = nil
     
     // Product IDs (Must match App Store Connect)
     private let productDict: [String: String]
@@ -84,13 +85,20 @@ class StoreManager: ObservableObject {
         isPremium = false
     }
     
-    private func requestProducts() async {
+    func requestProducts() async {
         do {
             let storeProducts = try await Product.products(for: productDict.values)
             // Sort by price for display
             products = storeProducts.sorted(by: { $0.price < $1.price })
+            
+            if products.isEmpty {
+                errorMessage = "No products found. Expected: \(productDict.values.joined(separator: ", "))"
+            } else {
+                errorMessage = nil
+            }
         } catch {
             print("Failed to request products: \(error)")
+            errorMessage = error.localizedDescription
         }
     }
     

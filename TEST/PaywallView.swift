@@ -43,7 +43,28 @@ struct PaywallView: View {
                 .padding(.horizontal)
                 
                 // Plans
-                if storeManager.products.isEmpty {
+                if let errorMessage = storeManager.errorMessage {
+                    VStack(spacing: 8) {
+                        Image(systemName: "exclamationmark.triangle")
+                            .font(.largeTitle)
+                            .foregroundStyle(.orange)
+                        Text("Failed to load plans")
+                            .font(.headline)
+                        Text(errorMessage)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                        
+                        Button("Retry") {
+                            Task {
+                                await storeManager.requestProducts()
+                            }
+                        }
+                        .buttonStyle(.bordered)
+                        .padding(.top, 4)
+                    }
+                    .padding()
+                } else if storeManager.products.isEmpty {
                     // Fallback or Loading
                     VStack {
                         ProgressView()
