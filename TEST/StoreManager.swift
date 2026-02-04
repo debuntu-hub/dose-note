@@ -12,6 +12,8 @@ class StoreManager: ObservableObject {
     // Product IDs (Must match App Store Connect)
     private let productDict: [String: String]
     
+    private var updateListenerTask: Task<Void, Error>? = nil
+
     init() {
         // Initialize with your product IDs
         self.productDict = [
@@ -19,10 +21,35 @@ class StoreManager: ObservableObject {
             "premium_yearly": "com.tomokiyoshuuwa.TEST.premium.yearly"
         ]
         
+        // Start a transaction listener as close to app launch as possible
+        updateListenerTask = listenForTransactions()
+        
         // Check initial entitlement
         Task {
             await updateCustomerProductStatus()
             await requestProducts()
+        }
+    }
+    
+    deinit {
+        updateListenerTask?.cancel()
+    }
+    
+    func listenForTransactions() -> Task<Void, Error> {
+        return Task {
+            for await result in Transaction.updates {
+                do {
+                    let transaction = try self.checkVerified(result)
+                    
+                    // The transaction is verified. Deliver content to the user.
+                    await self.updateCustomerProductStatus()
+                    
+                    // Always finish a transaction.
+                    await transaction.finish()
+                } catch {
+                    print("Transaction verification failed")
+                }
+            }
         }
     }
     

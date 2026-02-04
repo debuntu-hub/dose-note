@@ -3,7 +3,7 @@ import Combine
 
 struct ContentView: View {
     @StateObject private var store = DoseStore()
-    @StateObject private var storeManager = StoreManager()
+    @EnvironmentObject var storeManager: StoreManager
     @State private var showingPaywall = false
 
     var body: some View {
@@ -356,4 +356,5 @@ struct EditDoseView: View {
 
 #Preview {
     ContentView()
+        .environmentObject(StoreManager())
 }
