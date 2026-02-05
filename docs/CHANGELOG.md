@@ -18,6 +18,13 @@
 
 ## 2026年2月
 
+### 2026-02-05
+
+- `[Fix]` StoreKit設定ファイルのフォーマット修正
+  - StoreKit設定ファイル（Products.storekit）を古いXML形式からJSON形式（DoseNotePlans.storekit）へ変更
+  - シミュレーター環境での課金アイテム読み込みエラー（Products fetched: []）への対応
+  - 影響：iOSシミュレーター環境での課金テストが正常に行えるようになった
+
 ### 2026-02-03
 
 - `[Fix]` StoreKit製品情報取得ロジックの修正
