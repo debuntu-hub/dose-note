@@ -177,15 +177,12 @@ struct PaywallView: View {
                 .padding(.top, 20)
                 
                 // Restore & Cancel
-        // Removed auto-dismiss to allow user to see success message
-        /*
-        .onChange(of: storeManager.isPremium) { newValue in
-            if newValue {
-                print("[PaywallView] Premium status active. Dismissing.")
-                dismiss()
-            }
-        }
-        */                   }
+                VStack(spacing: 20) {
+                    HStack {
+                        Button("Restore".localized) {
+                            Task {
+                                await storeManager.restorePurchases()
+                            }
                         }
                         .font(.caption)
                         
@@ -202,13 +199,7 @@ struct PaywallView: View {
                 .padding(.bottom, 20)
             }
         }
-        .onChange(of: storeManager.isPremium) { newValue in
-            if newValue {
-                print("[PaywallView] Premium status active. Dismissing.")
-                dismiss()
-            }
-        }
-        .onChange(of: storeManager.purchaseErrorMessage) { newValue in
+        .onChange(of: storeManager.purchaseErrorMessage) { _, newValue in
             if newValue != nil {
                 print("[PaywallView] Purchase error detected: \(newValue ?? "")")
             }
