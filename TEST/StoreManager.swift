@@ -8,6 +8,7 @@ class StoreManager: ObservableObject {
     @Published var isPremium: Bool = false
     @Published var products: [Product] = []
     @Published var errorMessage: String? = nil
+    @Published var purchaseErrorMessage: String? = nil
     @Published var isPurchasing: Bool = false
     
     // Product IDs (Must match App Store Connect)
@@ -57,15 +58,20 @@ class StoreManager: ObservableObject {
     // MARK: - Purchasing
     
     func purchase(_ product: Product) async throws {
+        print("[StoreManager] Starting purchase for product: \(product.id)")
         // Prevent multiple simultaneous purchase attempts
-        guard !isPurchasing else { return }
+        guard !isPurchasing else {
+            print("[StoreManager] Purchase already in progress")
+            return
+        }
         
         isPurchasing = true
-        errorMessage = nil
+        purchaseErrorMessage = nil
         
         // Ensure isPurchasing is reset after the function returns (even if it throws)
         defer {
             isPurchasing = false
+            print("[StoreManager] Purchase flow ended")
         }
         
         do {
@@ -73,6 +79,7 @@ class StoreManager: ObservableObject {
             
             switch result {
             case .success(let verification):
+                print("[StoreManager] Purchase result: success")
                 // Check if the transaction is verified
                 let transaction = try checkVerified(verification)
                 
@@ -81,17 +88,22 @@ class StoreManager: ObservableObject {
                 
                 // Always finish a transaction.
                 await transaction.finish()
+                print("[StoreManager] Transaction finished successfully")
                 
             case .userCancelled:
+                print("[StoreManager] Purchase result: userCancelled")
                 break
             case .pending:
+                print("[StoreManager] Purchase result: pending")
                 break
             @unknown default:
+                print("[StoreManager] Purchase result: unknown")
                 break
             }
         } catch {
+            print("[StoreManager] Purchase error: \(error.localizedDescription)")
             // Update error message so the View can display it
-            self.errorMessage = error.localizedDescription
+            self.purchaseErrorMessage = error.localizedDescription
             throw error
         }
     }
@@ -131,12 +143,15 @@ class StoreManager: ObservableObject {
     }
     
     func requestProducts() async {
+        print("[StoreManager] Requesting products: \(productDict.values)")
         do {
             let storeProducts = try await Product.products(for: productDict.values)
+            print("[StoreManager] Products fetched: \(storeProducts.map { $0.id })")
             // Sort by price for display
             products = storeProducts.sorted(by: { $0.price < $1.price })
             
             if products.isEmpty {
+                print("[StoreManager] No products found matching IDs")
                 errorMessage = "No products found. Expected: \(productDict.values.joined(separator: ", "))"
             } else {
                 errorMessage = nil

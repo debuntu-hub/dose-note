@@ -76,6 +76,7 @@ struct PaywallView: View {
                 } else {
                     ForEach(storeManager.products) { product in
                         Button(action: {
+                            print("[PaywallView] Button tapped for product: \(product.id)")
                             Task {
                                 do {
                                     try await storeManager.purchase(product)
@@ -174,6 +175,25 @@ struct PaywallView: View {
                 .padding(.bottom, 20)
             }
         }
+        .onChange(of: storeManager.isPremium) { newValue in
+            if newValue {
+                print("[PaywallView] Premium status active. Dismissing.")
+                dismiss()
+            }
+        }
+        .onChange(of: storeManager.purchaseErrorMessage) { newValue in
+            if newValue != nil {
+                print("[PaywallView] Purchase error detected: \(newValue ?? "")")
+            }
+        }
+        .alert("Purchase Failed", isPresented: Binding<Bool>(
+            get: { storeManager.purchaseErrorMessage != nil },
+            set: { if !$0 { storeManager.purchaseErrorMessage = nil } }
+        ), actions: {
+            Button("OK", role: .cancel) { storeManager.purchaseErrorMessage = nil }
+        }, message: {
+            Text(storeManager.purchaseErrorMessage ?? "Unknown Error")
+        })
     }
     
     private func benefitRow(title: String, free: String, premium: String) -> some View {
