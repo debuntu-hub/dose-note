@@ -86,6 +86,8 @@ struct L10n {
         "Delete Confirmation": [.japanese: "本当に削除しますか？", .english: "Are you sure?"],
         "Delete": [.japanese: "削除", .english: "Delete"],
         "Cancel": [.japanese: "キャンセル", .english: "Cancel"],
+        "Premium Active": [.japanese: "プレミアムプラン：有効", .english: "Premium Active"],
+        "Thank You": [.japanese: "ご購入ありがとうございます！\nすべての機能が利用可能です。", .english: "Thank you for your purchase!\n All features are unlocked."],
     ]
 }
 

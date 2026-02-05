@@ -43,7 +43,29 @@ struct PaywallView: View {
                 .padding(.horizontal)
                 
                 // Plans
-                if let errorMessage = storeManager.errorMessage {
+                if storeManager.isPremium {
+                    VStack(spacing: 16) {
+                        Image(systemName: "checkmark.seal.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 60, height: 60)
+                            .foregroundStyle(.green)
+                        
+                        Text("Premium Active".localized)
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            
+                        Text("Thank You".localized)
+                            .font(.body)
+                            .multilineTextAlignment(.center)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color(UIColor.secondarySystemBackground))
+                    .cornerRadius(12)
+                    .padding(.horizontal)
+                } else if let errorMessage = storeManager.errorMessage {
                     VStack(spacing: 8) {
                         Image(systemName: "exclamationmark.triangle")
                             .font(.largeTitle)
@@ -155,12 +177,15 @@ struct PaywallView: View {
                 .padding(.top, 20)
                 
                 // Restore & Cancel
-                VStack(spacing: 20) {
-                    HStack {
-                        Button("Restore".localized) {
-                            Task {
-                                await storeManager.restorePurchases()
-                            }
+        // Removed auto-dismiss to allow user to see success message
+        /*
+        .onChange(of: storeManager.isPremium) { newValue in
+            if newValue {
+                print("[PaywallView] Premium status active. Dismissing.")
+                dismiss()
+            }
+        }
+        */                   }
                         }
                         .font(.caption)
                         
