@@ -89,13 +89,19 @@ class StoreManager: ObservableObject {
                 // Check if the transaction is verified
                 let transaction = try checkVerified(verification)
                 
+                // TRUST THE TRANSACTION IMMEDIATELY
+                await MainActor.run { 
+                    self.isPremium = true 
+                    self.debugStatus = "Purchase confirmed. Updating Entitlements..."
+                }
+
                 // The transaction is verified. Deliver content to the user.
                 await updateCustomerProductStatus()
                 
                 // Always finish a transaction.
                 await transaction.finish()
                 print("[StoreManager] Transaction finished successfully")
-                await MainActor.run { debugStatus = "Transaction finished." }
+                await MainActor.run { debugStatus = "Transaction finished. Premium: \(isPremium)" }
                 
             case .userCancelled:
                 print("[StoreManager] Purchase result: userCancelled")
@@ -129,29 +135,29 @@ class StoreManager: ObservableObject {
     
     func updateCustomerProductStatus() async {
         // Iterate through all of the user's purchased products.
+        var foundActive = false
         for await result in Transaction.currentEntitlements {
             do {
                 // Check whether the transaction is verified. If it isn't, catch `failedVerification` error.
                 let transaction = try checkVerified(result)
+                print("[StoreManager] Found entitlement: \(transaction.productID), type: \(transaction.productType)")
                 
-                // Check the type of product to the user.
-                switch transaction.productType {
-                case .autoRenewable:
-                    if transaction.revocationDate == nil {
-                        // The subscription is active.
-                        isPremium = true
-                        return // Found valid subscription
-                    }
-                default:
-                    break
+                // Check if matches our products OR is autoRenewable
+                if (transaction.productType == .autoRenewable || self.productDict.values.contains(transaction.productID)) && transaction.revocationDate == nil {
+                     foundActive = true
+                     // Continue loop to print all, or break? Let's break if found.
+                     break
                 }
             } catch {
                 print(error)
             }
         }
         
-        // If we get here, no valid subscription found
-        isPremium = false
+        let finalStatus = foundActive
+        await MainActor.run {
+            self.isPremium = finalStatus
+            print("[StoreManager] updateCustomerProductStatus complete. isPremium: \(finalStatus)")
+        }
     }
     
     func requestProducts() async {
