@@ -75,7 +75,7 @@ class StoreManager: ObservableObject {
         defer {
             isPurchasing = false
             print("[StoreManager] Purchase flow ended")
-            Task { @MainActor in debugStatus = "Purchase flow ended" }
+            // Do NOT overwrite debugStatus here, so we can see the result (Success/Failed/Cancelled)
         }
         
         do {
@@ -99,15 +99,15 @@ class StoreManager: ObservableObject {
                 
             case .userCancelled:
                 print("[StoreManager] Purchase result: userCancelled")
-                await MainActor.run { debugStatus = "User cancelled." }
+                await MainActor.run { debugStatus = "Result: User Cancelled (Check StoreKit config)" }
                 break
             case .pending:
                 print("[StoreManager] Purchase result: pending")
-                await MainActor.run { debugStatus = "Purchase pending." }
+                await MainActor.run { debugStatus = "Result: Pending (Parental control?)" }
                 break
             @unknown default:
                 print("[StoreManager] Purchase result: unknown")
-                await MainActor.run { debugStatus = "Unknown status." }
+                await MainActor.run { debugStatus = "Result: Unknown" }
                 break
             }
         } catch {
