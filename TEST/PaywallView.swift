@@ -64,16 +64,12 @@ struct PaywallView: View {
                         .padding(.top, 4)
                     }
                     .padding()
-                } else if storeManager.products.isEmpty {
-                    // Fallback or Loading
-                    VStack {
-                        ProgressView()
-                        Text("Loading Plan".localized)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    .padding()
                 } else {
+                    // Debug info (Hidden in production, useful for TestFlight)
+                    // Text("Products: \(storeManager.products.count)")
+                    //    .font(.caption2)
+                    //    .foregroundStyle(.tertiary)
+                    
                     ForEach(storeManager.products) { product in
                         Button(action: {
                             print("[PaywallView] Button tapped for product: \(product.id)")
@@ -147,6 +143,12 @@ struct PaywallView: View {
                         Link("Manage Sub".localized, destination: URL(string: "https://apps.apple.com/account/subscriptions")!)
                             .font(.caption)
                             .padding(.top, 2)
+                            
+                        // Debug Status (Temporary for troubleshooting)
+                        Text(storeManager.debugStatus)
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
+                            .padding(.top, 10)
                     }
                 }
                 .padding(.horizontal, 40)

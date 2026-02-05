@@ -10,6 +10,7 @@ class StoreManager: ObservableObject {
     @Published var errorMessage: String? = nil
     @Published var purchaseErrorMessage: String? = nil
     @Published var isPurchasing: Bool = false
+    @Published var debugStatus: String = "Ready" // For debugging
     
     // Product IDs (Must match App Store Connect)
     private let productDict: [String: String]
@@ -58,7 +59,8 @@ class StoreManager: ObservableObject {
     // MARK: - Purchasing
     
     func purchase(_ product: Product) async throws {
-        print("[StoreManager] Starting purchase for product: \(product.id)")
+        await MainActor.run { debugStatus = "Starting purchase..." }
+        
         // Prevent multiple simultaneous purchase attempts
         guard !isPurchasing else {
             print("[StoreManager] Purchase already in progress")
@@ -67,11 +69,13 @@ class StoreManager: ObservableObject {
         
         isPurchasing = true
         purchaseErrorMessage = nil
+        await MainActor.run { debugStatus = "Purchasing..." }
         
         // Ensure isPurchasing is reset after the function returns (even if it throws)
         defer {
             isPurchasing = false
             print("[StoreManager] Purchase flow ended")
+            Task { @MainActor in debugStatus = "Purchase flow ended" }
         }
         
         do {
@@ -80,6 +84,8 @@ class StoreManager: ObservableObject {
             switch result {
             case .success(let verification):
                 print("[StoreManager] Purchase result: success")
+                await MainActor.run { debugStatus = "Purchase success. Verifying..." }
+                
                 // Check if the transaction is verified
                 let transaction = try checkVerified(verification)
                 
@@ -89,20 +95,26 @@ class StoreManager: ObservableObject {
                 // Always finish a transaction.
                 await transaction.finish()
                 print("[StoreManager] Transaction finished successfully")
+                await MainActor.run { debugStatus = "Transaction finished." }
                 
             case .userCancelled:
                 print("[StoreManager] Purchase result: userCancelled")
+                await MainActor.run { debugStatus = "User cancelled." }
                 break
             case .pending:
                 print("[StoreManager] Purchase result: pending")
+                await MainActor.run { debugStatus = "Purchase pending." }
                 break
             @unknown default:
                 print("[StoreManager] Purchase result: unknown")
+                await MainActor.run { debugStatus = "Unknown status." }
                 break
             }
         } catch {
             print("[StoreManager] Purchase error: \(error.localizedDescription)")
             // Update error message so the View can display it
+            self.purchaseErrorMessage = error.localizedDescription
+            await MainActor.run { debugStatus = "Error: \(error.localizedDescription)" }
             self.purchaseErrorMessage = error.localizedDescription
             throw error
         }

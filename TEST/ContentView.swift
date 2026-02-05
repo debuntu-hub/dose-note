@@ -200,6 +200,7 @@ struct ContentView: View {
             }
             .sheet(isPresented: $showingPaywall) {
                 PaywallView(store: store)
+                    .environmentObject(storeManager)
             }
         }
     }
