@@ -1,28 +1,81 @@
 # 🏦 会社OS 銀行API連携サーバー (MCP)
 
-GMO青空ネット銀行のAPI（Sunabar環境）に接続し、残高や明細を取得するMCPサーバーです。
+GMO青空ネット銀行のAPI（Sunabar環境）に接続し、Copilotから直接残高や明細を取得するMCPサーバーです。
 
-## セットアップ手順
+## ✅ セットアップ完了
 
-### 1. 環境変数の設定
-`company-os-bank-mcp` ディレクトリにある `.env.template` を `.env` にリネーム（複製）し、Sunabarの情報を入力してください。
+すでに以下が完了しています：
+- Python仮想環境の構築
+- 必要なパッケージのインストール
+- アクセストークンの設定
+- API接続テスト成功
+- **MCPサーバーの実装完了**
 
-```bash
-cp .env.template .env
+## 🚀 使い方
+
+### 1. VS Code を再起動
+
+MCPサーバーを認識させるため、**VS Code を完全に再起動**してください。
+
+### 2. Copilotに話しかける
+
+再起動後、Copilotに以下のように質問できます：
+
+```
+今の口座残高を教えて
 ```
 
-**入力項目:**
-- `SUNABAR_USER_ID`: SunabarポータルにログインするID
-- `SUNABAR_PASSWORD`: Sunabarポータルにログインするパスワード
-- その他の項目は、APIを利用するためのアプリケーション登録後に取得します。
-
-### 2. インストール
-
-```bash
-cd company-os-bank-mcp
-pip install -r requirements.txt
+```
+過去30日の入出金明細を見せて
 ```
 
-### 3. アプリケーション登録 (APIキー発行)
-Sunabarポータルにログインし、テスト用のアプリケーションを作成して `CLIENT_ID` と `CLIENT_SECRET` を取得する必要があります。
-（詳細な手順はポータルサイトを参照してください）
+```
+今月の資金移動サマリーを取得して
+```
+
+### 3. 提供されるツール
+
+#### `get_account_balance`
+- 現在の残高、前日残高、前月残高を取得
+
+#### `get_transactions`
+- 指定期間の入出金明細を取得
+- パラメータ: `days`（デフォルト30日）
+
+#### `get_monthly_summary`
+- 指定月の入出金サマリーを取得（FCF分析用）
+- パラメータ: `year`, `month`（省略時は今月）
+
+## 🛠 トラブルシューティング
+
+### MCPサーバーが認識されない
+
+1. VS Codeを完全に再起動
+2. コマンドパレット（Cmd+Shift+P）→「Developer: Reload Window」
+3. `.vscode/settings.json` が正しく配置されているか確認
+
+### トークンエラーが出る
+
+アクセストークンの有効期限が切れた場合：
+1. [Sunabarポータル](https://portal.sunabar.gmo-aozora.com/login)にログイン
+2. 「sunabarサービスサイトで使える銀行口座」→「更新」ボタン
+3. 新しいトークンの取得
+4. `.env` ファイルの `ACCESS_TOKEN` を更新
+
+## 📂 ファイル構成
+
+```
+company-os-bank-mcp/
+├── server.py          # MCPサーバー本体
+├── .env               # 環境変数（トークン等）
+├── requirements.txt   # 依存パッケージ
+└── quick_test.py      # API接続テスト用
+```
+
+## 🎯 次のステップ
+
+このMCPサーバーを使って：
+1. **FCF入力の自動化**: 月末にCopilotに「今月のサマリーを取得して」と指示
+2. **資金管理の高速化**: いつでも残高確認可能
+3. **経営判断の迅速化**: 投資判断時にリアルタイムで資金状況を確認
+

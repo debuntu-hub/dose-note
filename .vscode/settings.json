@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "gmo-aozora-bank": {
+      "command": "/Users/tomokiyoshuuwa/Documents/TEST/TEST/company-os-bank-mcp/.venv/bin/python",
+      "args": [
+        "/Users/tomokiyoshuuwa/Documents/TEST/TEST/company-os-bank-mcp/server.py"
+      ],
+      "env": {
+        "PYTHONPATH": "/Users/tomokiyoshuuwa/Documents/TEST/TEST/company-os-bank-mcp"
+      }
+    }
+  }
+}
