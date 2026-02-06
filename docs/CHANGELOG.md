@@ -20,6 +20,28 @@
 
 ### 2026-02-07
 
+- `[実装]` TapKey仕様書v0.1に基づく不足機能の一括実装
+  - 仕様書（docs/TAPKEY_SPEC.md）とのギャップ分析を実施し、以下6機能を新規実装
+  - **OnboardingView**: 初回起動時ガイダンス画面（§3.1.2）
+    - 「考えずに作って、すぐ保存」のワンページチュートリアル
+    - @AppStorage による初回表示フラグ管理
+  - **SettingsView**: 設定画面（§3.5）
+    - 生体認証ロック情報表示、自動ロック時間選択、クリップボードクリア時間選択
+    - アプリ情報（バージョン・暗号化・保管先）、ガイダンス再表示機能
+  - **ClipboardManager**: クリップボード自動消去（§2.4）
+    - 指定秒数後にUIPasteboardを自動クリア（デフォルト30秒）
+    - 全コピー操作をClipboardManager経由に統一
+  - **PurchaseManager**: StoreKit 2フリーミアム管理（§8.2-8.6）
+    - 無料10件制限、買い切りプレミアム（com.tapkey.app.premium）
+    - Transaction.updates リスナー、購入復元対応
+  - **UpgradeView**: アップグレード案内画面（§8.6）
+    - 無料/プレミアム機能比較リスト、購入ボタン、復元ボタン
+  - **VaultListView改修**: ワンタップコピー＋スワイプ操作（§3.2）
+    - 一覧からワンタップでパスワードコピー（視覚フィードバック付き）
+    - スワイプ左でIDコピー
+  - 既存ファイル7件（TapKeyApp, ContentView, HomeViewModel, HomeView, VaultDetailView, VaultListView, HomeView）を修正
+  - 関連判断: DEC-2026-02-07-03
+
 - `[システム]` 収益化・資金管理仕様書に基づく不足機能の実装
   - docs/MONETIZATION_SPEC.md を正（Single Source of Truth）として登録済み
   - 不足していた以下の管理機能を新規構築：
