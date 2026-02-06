@@ -1,0 +1,40 @@
+{
+  "identifier" : "F8E6B3A4",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "980",
+      "familyShareable" : false,
+      "internalID" : "6738492847",
+      "localizations" : [
+        {
+          "description" : "パスワード保存件数が無制限になります。買い切りなので、一度の購入で永久に使えます。",
+          "displayName" : "TapKey Premium",
+          "locale" : "ja"
+        },
+        {
+          "description" : "Unlock unlimited password storage. One-time purchase, lifetime access.",
+          "displayName" : "TapKey Premium",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.tapkey.app.premium",
+      "referenceName" : "TapKey Premium",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+    "_applicationInternalID" : "6738492847",
+    "_developerTeamID" : "YOUR_TEAM_ID",
+    "_lastSynchronizedDate" : 760276800.0
+  },
+  "subscriptionGroups" : [
+
+  ],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}
