@@ -1,0 +1,51 @@
+tasks:
+  - id: T-00
+    title: プロジェクト初期化
+    status: done
+    items:
+      - [x] Xcodeプロジェクト設定確認
+      - [x] Gitリポジトリ初期化・除外設定
+      - [x] フォルダ構造の整理 (MVVM構成)
+
+  - id: T-01
+    title: データ層・セキュリティ層の実装
+    status: done
+    items:
+      - [x] Model定義 (VaultItem)
+      - [x] KeychainManager (CryptoKit鍵管理) 実装
+      - [x] CryptoManager (暗号化・復号化) 実装
+      - [x] PersistenceController (Core Data) 設定 (SwiftDataで実装)
+
+  - id: T-02
+    title: UI実装 - 生成画面 (Home)
+    status: done
+    items:
+      - [x] PasswordGenerator ロジック実装
+      - [x] 生成画面 UIレイアウト
+      - [x] サービス名・ID入力フォーム
+      - [x] 保存処理の実装
+
+  - id: T-03
+    title: UI実装 - 一覧画面 (Vault)
+    status: done
+    items:
+      - [x] リスト表示 UI
+      - [x] 検索機能
+      - [x] 詳細・編集・削除機能 (編集はv0.2へ)
+      - [x] クリップボードコピー機能
+
+  - id: T-04
+    title: 生体認証・全体統合
+    status: done
+    items:
+      - [x] LocalAuthentication 実装 (BiometricAuth)
+      - [x] アプリ起動時のロック画面
+      - [x] バックグラウンド移行時のデータ保護・クリップボードクリア
+
+  - id: T-05
+    title: テスト・研磨
+    status: done
+    items:
+      - [x] エッジケース動作確認 (GATE_C_VERIFICATION.md)
+      - [x] UI調整・Haptics追加 (HomeView, DetailView等で実装済)
+      - [x] アプリアイコン設定 (スクリプト生成済)

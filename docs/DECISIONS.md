@@ -316,6 +316,31 @@
 
 ---
 
+### DEC-2026-02-06-01: 銀行API自動連携の導入（会社OS自動化）
+
+**判断日**: 2026年2月6日  
+**判断者**: CEO  
+**判断内容**: GMOあおぞらネット銀行APIとMCPサーバーを活用し、FCF入力を完全自動化する
+
+**理由**:
+- FCF入力の手間をゼロにし、リアルタイムな経営判断を可能にするため
+- 個人・プライベートアクセスで利用可能であることが確認できたため
+- 「AI全自動CFO」への第一歩として最適
+
+**FCFへの影響予測**:
+- [x] プラス（運用コスト削減、判断速度向上）
+
+**影響範囲**:
+- docs/TASKS.yaml Phase 6 追加
+- docs/BANK_API_INTEGRATION.md 新規作成
+- MCPサーバーの実装
+
+**関連文書**:
+- [BANK_API_INTEGRATION.md](./BANK_API_INTEGRATION.md)
+- [TASKS.yaml](./TASKS.yaml)
+
+---
+
 ## 保留中の判断
 
 *CEO_DASHBOARD.md の「要判断事項」を参照*

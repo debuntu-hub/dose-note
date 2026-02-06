@@ -81,12 +81,29 @@ extension NSColor {
     }
 }
 
-func drawIcon(size: Int, title: String, color1: NSColor, color2: NSColor) -> NSImage {
-    let imgSize = NSSize(width: size, height: size)
-    let image = NSImage(size: imgSize)
-    image.lockFocus()
+func generateIconData(pixelSize: Int, title: String, color1: NSColor, color2: NSColor) -> Data? {
+    // Correctly create a bitmap representation with EXACT pixel dimensions
+    let rep = NSBitmapImageRep(
+        bitmapDataPlanes: nil,
+        pixelsWide: pixelSize,
+        pixelsHigh: pixelSize,
+        bitsPerSample: 8,
+        samplesPerPixel: 4,
+        hasAlpha: true,
+        isPlanar: false,
+        colorSpaceName: .deviceRGB, 
+        bytesPerRow: 0,
+        bitsPerPixel: 32
+    )
+    guard let bitmapRep = rep else { return nil }
 
-    let rect = NSRect(origin: .zero, size: imgSize)
+    // Create a graphics context from the bitmap representation
+    NSGraphicsContext.saveGraphicsState()
+    guard let context = NSGraphicsContext(bitmapImageRep: bitmapRep) else { return nil }
+    NSGraphicsContext.current = context
+
+    // Draw background gradient
+    let rect = NSRect(x: 0, y: 0, width: CGFloat(pixelSize), height: CGFloat(pixelSize))
     if let gradient = NSGradient(colors: [color1, color2]) {
         gradient.draw(in: rect, angle: 90)
     } else {
@@ -94,12 +111,12 @@ func drawIcon(size: Int, title: String, color1: NSColor, color2: NSColor) -> NSI
         rect.fill()
     }
 
+    // Draw text
     let letter = String(title.prefix(1)).uppercased()
-    let fontSize = CGFloat(size) * 0.58
+    let fontSize = CGFloat(pixelSize) * 0.6
     let font = NSFont.systemFont(ofSize: fontSize, weight: .heavy)
     let paragraph = NSMutableParagraphStyle()
     paragraph.alignment = .center
-    paragraph.lineBreakMode = .byClipping
 
     let attributes: [NSAttributedString.Key: Any] = [
         .font: font,
@@ -108,25 +125,19 @@ func drawIcon(size: Int, title: String, color1: NSColor, color2: NSColor) -> NSI
     ]
     let attributed = NSAttributedString(string: letter, attributes: attributes)
     let textSize = attributed.size()
+    // Center vertically with slight adjustment
     let textRect = NSRect(
-        x: (CGFloat(size) - textSize.width) / 2.0,
-        y: (CGFloat(size) - textSize.height) / 2.0,
+        x: (CGFloat(pixelSize) - textSize.width) / 2.0,
+        y: (CGFloat(pixelSize) - textSize.height) / 2.0 - (textSize.height * 0.05),
         width: textSize.width,
         height: textSize.height
     )
     attributed.draw(in: textRect)
 
-    image.unlockFocus()
-    return image
-}
-
-func savePNG(_ image: NSImage, to url: URL) throws {
-    guard let tiff = image.tiffRepresentation,
-          let rep = NSBitmapImageRep(data: tiff),
-          let data = rep.representation(using: .png, properties: [:]) else {
-        throw NSError(domain: "GenerateAppIcon", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to create PNG data"])
-    }
-    try data.write(to: url)
+    NSGraphicsContext.restoreGraphicsState()
+    
+    // Convert to PNG data
+    return bitmapRep.representation(using: .png, properties: [:])
 }
 
 struct IconSpec {
@@ -196,8 +207,9 @@ func main() throws {
     let cli = CLI.parse()
 
     let fm = FileManager.default
+    // リトライ時はディレクトリがあってもOK
     let outputURL = URL(fileURLWithPath: cli.outputPath, isDirectory: true)
-    try fm.createDirectory(at: outputURL, withIntermediateDirectories: true)
+    try? fm.createDirectory(at: outputURL, withIntermediateDirectories: true)
 
     let color1 = NSColor.fromHex(cli.color1Hex)
     let color2 = NSColor.fromHex(cli.color2Hex)
@@ -206,10 +218,18 @@ func main() throws {
 
     for spec in specs {
         let size = spec.pixelSize
-        let image = drawIcon(size: size, title: cli.title, color1: color1, color2: color2)
+        guard let data = generateIconData(pixelSize: size, title: cli.title, color1: color1, color2: color2) else {
+             print("Failed to generate icon for \(spec.filename)")
+             continue
+        }
         let fileURL = outputURL.appendingPathComponent(spec.filename)
-        try savePNG(image, to: fileURL)
-        print("Wrote \(fileURL.path)")
+        // 既存チェックなしで上書き
+        do {
+            try data.write(to: fileURL)
+            print("Wrote \(fileURL.path)")
+        } catch {
+            print("Error writing \(fileURL.path): \(error)")
+        }
     }
 
     let imagesJSON: [ImageJSON] = specs.map { spec in
