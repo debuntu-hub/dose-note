@@ -18,6 +18,25 @@
 
 ## 2026年2月
 
+### 2026-02-07
+
+- `[システム]` 収益化・資金管理仕様書に基づく不足機能の実装
+  - docs/MONETIZATION_SPEC.md を正（Single Source of Truth）として登録済み
+  - 不足していた以下の管理機能を新規構築：
+    - data/expense_ledger.csv: 経費台帳（勘定科目・家事按分対応）
+    - data/expense_ledger_README.md: 経費台帳入力ガイド
+    - docs/FINANCIAL_MANAGEMENT.md: 資金管理ダッシュボード
+      - 収益マイルストーン追跡（月5万→10万→30万）
+      - 口座・カード管理
+      - 元入金（事業主借）追跡
+      - 擬似給料管理
+      - 税金プール（利益30%隔離）
+      - 利益配分管理（税金30%/再投資40%/給料30%）
+      - 法人化判断ライン（年利益500万超）
+      - 経費サマリー
+  - CEO_DASHBOARD.md: マイルストーン・資金管理セクション追加
+  - 会社OS.md: Single Source of Truthにファイル追加
+
 ### 2026-02-05
 
 - `[Fix]` StoreKit設定ファイルのフォーマット修正

@@ -52,12 +52,22 @@
 
 ```
 docs/
-├─ CEO_DASHBOARD.md   （社長の判断UI）
-├─ PRD.md             （企画）
-├─ SRS.md             （仕様）
-├─ TASKS.yaml         （WBS）
-├─ DECISIONS.md       （最終判断ログ）
-└─ CHANGELOG.md       （変更履歴）
+├─ CEO_DASHBOARD.md         （社長の判断UI）
+├─ PRD.md                   （企画）
+├─ SRS.md                   （仕様）
+├─ TASKS.yaml               （WBS）
+├─ DECISIONS.md             （最終判断ログ）
+├─ CHANGELOG.md             （変更履歴）
+├─ MONETIZATION_SPEC.md     （収益化・資金管理仕様）
+├─ FINANCIAL_MANAGEMENT.md  （資金管理ダッシュボード）
+├─ FCF_REPORT.md            （FCFレポート）
+├─ FEATURES.md              （機能定義）
+├─ FEATURE_FCF_REPORT.md    （機能別FCFレポート）
+└─ ASSETS.md                （資産台帳）
+
+data/
+├─ fcf_input.csv            （FCF入力原本）
+└─ expense_ledger.csv       （経費台帳）
 ```
 
 会話・一時的出力・メモは正としない。
