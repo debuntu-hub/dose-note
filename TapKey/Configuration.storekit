@@ -5,7 +5,7 @@
   ],
   "products" : [
     {
-      "displayPrice" : "¥980",
+      "displayPrice" : "9.99",
       "familyShareable" : false,
       "internalID" : "6738492847",
       "localizations" : [
@@ -28,7 +28,9 @@
   "settings" : {
     "_applicationInternalID" : "6738492847",
     "_developerTeamID" : "YOUR_TEAM_ID",
-    "_lastSynchronizedDate" : 760276800.0
+    "_lastSynchronizedDate" : 760276800.0,
+    "_locale" : "ja_JP",
+    "_storefront" : "JPN"
   },
   "subscriptionGroups" : [
 
