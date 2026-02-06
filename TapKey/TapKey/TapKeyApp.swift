@@ -12,6 +12,7 @@ import SwiftData
 struct TapKeyApp: App {
     @Environment(\.scenePhase) private var scenePhase
     @State private var biometricManager = BiometricManager()
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
     
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
@@ -29,13 +30,17 @@ struct TapKeyApp: App {
     var body: some Scene {
         WindowGroup {
             ZStack {
-                ContentView()
-                    .environment(biometricManager)
-                
-                if biometricManager.isLocked {
-                    LockView(manager: biometricManager)
-                        .transition(.opacity)
-                        .zIndex(100) // 最前面に
+                if !hasCompletedOnboarding {
+                    OnboardingView()
+                } else {
+                    ContentView()
+                        .environment(biometricManager)
+                    
+                    if biometricManager.isLocked {
+                        LockView(manager: biometricManager)
+                            .transition(.opacity)
+                            .zIndex(100)
+                    }
                 }
             }
         }
@@ -45,7 +50,7 @@ struct TapKeyApp: App {
             case .background:
                 // バックグラウンド移行時に即ロック＆クリップボードクリア
                 biometricManager.lock()
-                UIPasteboard.general.string = ""
+                ClipboardManager.shared.clearNow()
             case .inactive:
                 // アプリスイッチャー表示中などは画面を隠すためにロック状態へ
                 // ただし、バックグラウンドではないのでクリップボードクリアまではしないかもしれないが

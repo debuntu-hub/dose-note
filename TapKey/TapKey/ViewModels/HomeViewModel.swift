@@ -12,6 +12,7 @@ class HomeViewModel {
     var isSaved: Bool = false
     var showAlert: Bool = false
     var alertMessage: String = ""
+    var showUpgrade: Bool = false
     
     init() {
         // 起動時に自動生成
@@ -24,17 +25,25 @@ class HomeViewModel {
     }
     
     func copyPassword() {
-        UIPasteboard.general.string = password
+        ClipboardManager.shared.copy(password)
     }
     
     func copyUsername() {
-        UIPasteboard.general.string = username
+        ClipboardManager.shared.copy(username)
     }
     
     func save(modelContext: ModelContext) {
         guard !serviceName.isEmpty else {
             alertMessage = "サービス名を入力してください"
             showAlert = true
+            return
+        }
+        
+        // 保存件数チェック (§8.3: 無料10件制限)
+        let descriptor = FetchDescriptor<VaultItem>()
+        let currentCount = (try? modelContext.fetchCount(descriptor)) ?? 0
+        guard PurchaseManager.shared.canSave(currentCount: currentCount) else {
+            showUpgrade = true
             return
         }
         

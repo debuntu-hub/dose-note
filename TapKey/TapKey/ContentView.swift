@@ -25,7 +25,7 @@ struct ContentView: View {
                 }
                 .tag(1)
             
-            Text("Settings (v0.2)")
+            SettingsView()
                 .tabItem {
                     Label("Settings", systemImage: "gear")
                 }

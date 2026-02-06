@@ -21,8 +21,7 @@ struct VaultDetailView: View {
                         Text(payload.username)
                         Spacer()
                         Button(action: {
-                            UIPasteboard.general.string = payload.username
-                            UINotificationFeedbackGenerator().notificationOccurred(.success)
+                            ClipboardManager.shared.copy(payload.username)
                         }) {
                             Image(systemName: "doc.on.doc")
                         }
@@ -53,8 +52,7 @@ struct VaultDetailView: View {
                                 .frame(height: 20)
                             
                             Button(action: {
-                                UIPasteboard.general.string = payload.password
-                                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                                ClipboardManager.shared.copy(payload.password)
                             }) {
                                 Image(systemName: "doc.on.doc")
                             }

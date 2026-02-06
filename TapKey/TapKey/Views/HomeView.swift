@@ -4,6 +4,7 @@ import SwiftData
 struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var viewModel = HomeViewModel()
+    @Query private var allItems: [VaultItem]
     @FocusState private var focusedField: Field?
     
     enum Field {
@@ -98,6 +99,13 @@ struct HomeView: View {
                     Spacer(minLength: 20)
                     
                     // 保存ボタン
+                    if !PurchaseManager.shared.isPremium {
+                        let remaining = PurchaseManager.shared.remainingSlots(currentCount: allItems.count)
+                        Text("残り\(remaining)件保存可能（無料）")
+                            .font(.caption)
+                            .foregroundStyle(remaining <= 3 ? .orange : .secondary)
+                    }
+                    
                     Button(action: {
                         viewModel.save(modelContext: modelContext)
                         // キーボードを閉じる
@@ -130,10 +138,10 @@ struct HomeView: View {
                 }
                 Button("一覧を見る") {
                     viewModel.reset()
-                    // 簡易的な遷移（TabViewの仕様による）
-                    // 実際にはBindingやEnvironmentObjectでタブを切り替える実装が必要
-                    // ここでは一旦リセットのみとする
                 }
+            }
+            .sheet(isPresented: $viewModel.showUpgrade) {
+                UpgradeView()
             }
         }
         .onAppear {
