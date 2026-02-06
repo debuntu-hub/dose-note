@@ -330,7 +330,8 @@
   - [x] ワンタップコピー＋スワイプIDコピー（§3.2）
   - [x] フリーミアム課金（10件無料→買い切りプレミアム）（§8）
 - **次のステップ**:
-  - [ ] StoreKit設定ファイル作成（App Store Connect連携前のローカルテスト用）
+  - [x] StoreKit設定ファイル作成（App Store Connect連携前のローカルテスト用）
+  - [ ] Xcodeプロジェクトでの設定（Editor > Run with > Configuration.storekit）
   - [ ] App Store Connect設定（製品ID登録、スクリーンショット、メタデータ）
   - [ ] TestFlightテスト配信
 - **v0.2以降の機能**:
