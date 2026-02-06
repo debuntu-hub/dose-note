@@ -557,3 +557,29 @@
 **関連文書**:
 - [BANK_API_INTEGRATION.md](./BANK_API_INTEGRATION.md)
 - [company-os-bank-mcp/README.md](../company-os-bank-mcp/README.md)
+
+---
+
+### DEC-2026-02-07-02: 収益化・資金管理仕様書に基づく不足機能実装
+
+**判断日**: 2026年2月7日  
+**判断者**: CEO  
+**判断内容**: MONETIZATION_SPEC.mdに定義されているが未実装だった管理機能を一括構築する
+
+**理由**:
+- 仕様書（§4〜§12）に定義された口座管理・経費管理・税金プール・擬似給料・法人化判断の追跡機能が未実装だった
+- 事業開始時点で資金管理の仕組みを整備しておく必要がある
+
+**実装内容**:
+1. `data/expense_ledger.csv` - 経費台帳（勘定科目・家事按分対応）
+2. `data/expense_ledger_README.md` - 経費台帳入力ガイド
+3. `docs/FINANCIAL_MANAGEMENT.md` - 資金管理ダッシュボード（マイルストーン・税金プール・擬似給料・法人化判断を統合）
+4. `docs/CEO_DASHBOARD.md` - マイルストーン・資金管理セクション追加
+5. `docs/会社OS.md` - Single Source of Truthに新規ファイル追加
+
+**影響範囲**:
+- 会社OS: SSoT定義の拡張
+- CEO_DASHBOARD: 資金管理の可視化追加
+- data/: 経費管理の原本追加
+
+**関連仕様**: [MONETIZATION_SPEC.md](./MONETIZATION_SPEC.md)
