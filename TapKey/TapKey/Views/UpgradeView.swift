@@ -1,4 +1,5 @@
 import SwiftUI
+import StoreKit
 
 /// アップグレード案内画面 (§8.6)
 /// 保存件数上限到達時に表示
