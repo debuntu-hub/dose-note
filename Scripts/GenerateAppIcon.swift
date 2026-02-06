@@ -2,9 +2,10 @@ import Foundation
 import AppKit
 
 struct CLI {
-    var title: String = "D"
-    var color1Hex: String = "#6A5AE0"
-    var color2Hex: String = "#8ED1FC"
+    var title: String = "" 
+    var color1Hex: String = "#434343" 
+    var color2Hex: String = "#000000" 
+    var iconSymbol: String = "key.fill"
     var outputPath: String = "Assets.xcassets/AppIcon.appiconset"
 
     static func parse() -> CLI {
@@ -26,6 +27,8 @@ struct CLI {
                 if let v = readValue() { cli.color1Hex = v }
             case "--color2":
                 if let v = readValue() { cli.color2Hex = v }
+            case "--symbol":
+                if let v = readValue() { cli.iconSymbol = v }
             case "--output":
                 if let v = readValue() { cli.outputPath = v }
             case "--help", "-h":
@@ -40,16 +43,17 @@ struct CLI {
     static func printUsageAndExit() -> Never {
         let usage = """
         GenerateAppIcon.swift
-        Generates placeholder iOS app icons (iPhone/iPad + App Store 1024) into an AppIcon.appiconset.
+        Generates stylish iOS app icons using SF Symbols and Gradients.
 
         Usage:
-          xcrun swift Scripts/GenerateAppIcon.swift [--title "Dose"] [--color1 "#6A5AE0"] [--color2 "#8ED1FC"] [--output "Assets.xcassets/AppIcon.appiconset"]
+          xcrun swift Scripts/GenerateAppIcon.swift [--symbol "key.fill"] [--color1 "#434343"] [--color2 "#000000"]
 
         Options:
-          --title   Text to render (first character is used). Default: D
-          --color1  Start color in hex (#RRGGBB or #RRGGBBAA). Default: #6A5AE0
-          --color2  End color in hex (#RRGGBB or #RRGGBBAA). Default: #8ED1FC
-          --output  Path to AppIcon.appiconset. Default: Assets.xcassets/AppIcon.appiconset
+          --symbol  SF Symbol name to render. Default: key.fill
+          --title   (Optional) Text to render instead of symbol.
+          --color1  Start color in hex. Default: #434343
+          --color2  End color in hex. Default: #000000
+          --output  Path to AppIcon.appiconset.
         """
         print(usage)
         exit(0)
@@ -81,8 +85,7 @@ extension NSColor {
     }
 }
 
-func generateIconData(pixelSize: Int, title: String, color1: NSColor, color2: NSColor) -> Data? {
-    // Correctly create a bitmap representation with EXACT pixel dimensions
+func generateIconData(pixelSize: Int, title: String, symbol: String, color1: NSColor, color2: NSColor) -> Data? {
     let rep = NSBitmapImageRep(
         bitmapDataPlanes: nil,
         pixelsWide: pixelSize,
@@ -97,46 +100,76 @@ func generateIconData(pixelSize: Int, title: String, color1: NSColor, color2: NS
     )
     guard let bitmapRep = rep else { return nil }
 
-    // Create a graphics context from the bitmap representation
     NSGraphicsContext.saveGraphicsState()
     guard let context = NSGraphicsContext(bitmapImageRep: bitmapRep) else { return nil }
     NSGraphicsContext.current = context
 
-    // Draw background gradient
+    // 1. Background Gradient
     let rect = NSRect(x: 0, y: 0, width: CGFloat(pixelSize), height: CGFloat(pixelSize))
     if let gradient = NSGradient(colors: [color1, color2]) {
-        gradient.draw(in: rect, angle: 90)
+        gradient.draw(in: rect, angle: -45)
     } else {
         color1.setFill()
         rect.fill()
     }
 
-    // Draw text
-    let letter = String(title.prefix(1)).uppercased()
-    let fontSize = CGFloat(pixelSize) * 0.6
-    let font = NSFont.systemFont(ofSize: fontSize, weight: .heavy)
-    let paragraph = NSMutableParagraphStyle()
-    paragraph.alignment = .center
+    // 2. Glossy Overlay (Subtle)
+    if let gloss = NSGradient(colors: [NSColor.white.withAlphaComponent(0.1), NSColor.white.withAlphaComponent(0.0)]) {
+        let glossRect = NSRect(x: 0, y: CGFloat(pixelSize) * 0.4, width: CGFloat(pixelSize), height: CGFloat(pixelSize) * 0.6)
+        gloss.draw(in: glossRect, angle: 90)
+    }
 
-    let attributes: [NSAttributedString.Key: Any] = [
-        .font: font,
-        .foregroundColor: NSColor.white,
-        .paragraphStyle: paragraph
-    ]
-    let attributed = NSAttributedString(string: letter, attributes: attributes)
-    let textSize = attributed.size()
-    // Center vertically with slight adjustment
-    let textRect = NSRect(
-        x: (CGFloat(pixelSize) - textSize.width) / 2.0,
-        y: (CGFloat(pixelSize) - textSize.height) / 2.0 - (textSize.height * 0.05),
-        width: textSize.width,
-        height: textSize.height
-    )
-    attributed.draw(in: textRect)
+    // 3. Content
+    let shadow = NSShadow()
+    shadow.shadowColor = NSColor.black.withAlphaComponent(0.4)
+    shadow.shadowOffset = NSSize(width: 0, height: -CGFloat(pixelSize) * 0.02)
+    shadow.shadowBlurRadius = CGFloat(pixelSize) * 0.04
+    shadow.set()
+
+    if !title.isEmpty {
+        let letter = String(title.prefix(1)).uppercased()
+        let fontSize = CGFloat(pixelSize) * 0.6
+        let font = NSFont.systemFont(ofSize: fontSize, weight: .bold)
+        let paragraph = NSMutableParagraphStyle()
+        paragraph.alignment = .center
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: font,
+            .foregroundColor: NSColor.white,
+            .paragraphStyle: paragraph
+        ]
+        let attributed = NSAttributedString(string: letter, attributes: attributes)
+        let textSize = attributed.size()
+        let textRect = NSRect(
+            x: (CGFloat(pixelSize) - textSize.width) / 2.0,
+            y: (CGFloat(pixelSize) - textSize.height) / 2.0,
+            width: textSize.width,
+            height: textSize.height
+        )
+        attributed.draw(in: textRect)
+    } else {
+        // SF Symbol Drawing
+        if let image = NSImage(systemSymbolName: symbol, accessibilityDescription: nil) {
+             let symbolSize = CGFloat(pixelSize) * 0.6
+             let destRect = NSRect(
+                 x: (CGFloat(pixelSize) - symbolSize) / 2.0,
+                 y: (CGFloat(pixelSize) - symbolSize) / 2.0,
+                 width: symbolSize,
+                 height: symbolSize
+             )
+             
+             // Tint white
+             if let tintedImage = image.copy() as? NSImage {
+                 tintedImage.lockFocus()
+                 NSColor.white.set()
+                 let r = NSRect(origin: .zero, size: image.size)
+                 r.fill(using: .sourceIn)
+                 tintedImage.unlockFocus()
+                 tintedImage.draw(in: destRect, from: .zero, operation: .sourceOver, fraction: 1.0)
+             }
+        }
+    }
 
     NSGraphicsContext.restoreGraphicsState()
-    
-    // Convert to PNG data
     return bitmapRep.representation(using: .png, properties: [:])
 }
 
@@ -175,7 +208,6 @@ struct ContentsJSON: Codable { let images: [ImageJSON]; let info: InfoJSON }
 
 func generateSpecs() -> [IconSpec] {
     var specs: [IconSpec] = []
-    // iPhone
     specs += [
         IconSpec(idiom: "iphone", pointSize: 20, scale: 2),
         IconSpec(idiom: "iphone", pointSize: 20, scale: 3),
@@ -186,7 +218,6 @@ func generateSpecs() -> [IconSpec] {
         IconSpec(idiom: "iphone", pointSize: 60, scale: 2),
         IconSpec(idiom: "iphone", pointSize: 60, scale: 3),
     ]
-    // iPad
     specs += [
         IconSpec(idiom: "ipad", pointSize: 20, scale: 1),
         IconSpec(idiom: "ipad", pointSize: 20, scale: 2),
@@ -198,32 +229,24 @@ func generateSpecs() -> [IconSpec] {
         IconSpec(idiom: "ipad", pointSize: 76, scale: 2),
         IconSpec(idiom: "ipad", pointSize: 83.5, scale: 2),
     ]
-    // App Store
     specs += [ IconSpec(idiom: "ios-marketing", pointSize: 1024, scale: 1) ]
     return specs
 }
 
 func main() throws {
     let cli = CLI.parse()
-
     let fm = FileManager.default
-    // リトライ時はディレクトリがあってもOK
     let outputURL = URL(fileURLWithPath: cli.outputPath, isDirectory: true)
     try? fm.createDirectory(at: outputURL, withIntermediateDirectories: true)
-
     let color1 = NSColor.fromHex(cli.color1Hex)
     let color2 = NSColor.fromHex(cli.color2Hex)
-
     let specs = generateSpecs()
-
     for spec in specs {
-        let size = spec.pixelSize
-        guard let data = generateIconData(pixelSize: size, title: cli.title, color1: color1, color2: color2) else {
+        guard let data = generateIconData(pixelSize: spec.pixelSize, title: cli.title, symbol: cli.iconSymbol, color1: color1, color2: color2) else {
              print("Failed to generate icon for \(spec.filename)")
              continue
         }
         let fileURL = outputURL.appendingPathComponent(spec.filename)
-        // 既存チェックなしで上書き
         do {
             try data.write(to: fileURL)
             print("Wrote \(fileURL.path)")
@@ -231,7 +254,6 @@ func main() throws {
             print("Error writing \(fileURL.path): \(error)")
         }
     }
-
     let imagesJSON: [ImageJSON] = specs.map { spec in
         ImageJSON(idiom: spec.idiom, size: spec.sizeString, scale: spec.scaleString, filename: spec.filename)
     }
@@ -242,11 +264,8 @@ func main() throws {
     let data = try encoder.encode(contents)
     try data.write(to: jsonURL)
     print("Updated \(jsonURL.path)")
-
     print("\nDone. Open Assets.xcassets > AppIcon to preview.")
 }
-
-func printUsageAndExit() -> Never { CLI.printUsageAndExit() }
 
 do { try main() } catch {
     fputs("Error: \(error.localizedDescription)\n", stderr)

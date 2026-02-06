@@ -129,6 +129,6 @@ phases:
         notes: "FastMCP使用・3ツール実装（残高・明細・月次）完了（2026-02-06）"
       - id: "task_604"
         title: "Copilot統合テスト"
-        status: "not_started"
+        status: "completed"
         assignee: "CEO"
-        notes: "VS Code再起動後、Copilotから銀行APIツールを呼び出してテスト"
+        notes: "VS Code再起動後、MCPサーバー経由で残高取得成功（2026-02-07）"
