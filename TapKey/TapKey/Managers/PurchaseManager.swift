@@ -8,10 +8,10 @@ class PurchaseManager {
     static let shared = PurchaseManager()
     
     /// 無料プランの保存上限
-    static let freeLimit = 10
+    nonisolated static let freeLimit = 10
     
     /// 買い切り製品ID
-    static let premiumProductID = "com.tapkey.app.premium"
+    nonisolated static let premiumProductID = "com.tapkey.app.premium"
     
     /// プレミアム解放済みか
     var isPremium: Bool = false
