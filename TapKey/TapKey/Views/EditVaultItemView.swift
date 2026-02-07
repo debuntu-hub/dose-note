@@ -10,7 +10,7 @@ struct EditVaultItemView: View {
     // 編集用の一時ステート
     @State private var serviceName: String = ""
     @State private var username: String = ""
-    @State private var password: String = ""
+    @State private var passwords: [PasswordEntry] = []
     @State private var note: String = ""
     
     @State private var isLoading: Bool = true
@@ -33,18 +33,50 @@ struct EditVaultItemView: View {
                     }
                     
                     Section(header: Text("パスワード")) {
-                        HStack {
-                            TextField("パスワード", text: $password)
-                                .font(.system(.body, design: .monospaced))
-                                .autocorrectionDisabled()
-                                .textInputAutocapitalization(.never)
-                            
-                            Button(action: {
-                                password = PasswordGenerator.generate()
-                            }) {
-                                Image(systemName: "arrow.clockwise")
+                        ForEach(Array(passwords.enumerated()), id: \.element.id) { index, entry in
+                            VStack(alignment: .leading, spacing: 4) {
+                                if passwords.count > 1 {
+                                    HStack {
+                                        TextField("ラベル", text: $passwords[index].label)
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                        Spacer()
+                                        Button(action: {
+                                            if passwords.count > 1 {
+                                                passwords.remove(at: index)
+                                            }
+                                        }) {
+                                            Image(systemName: "minus.circle.fill")
+                                                .foregroundStyle(.red)
+                                                .font(.caption)
+                                        }
+                                        .buttonStyle(.borderless)
+                                    }
+                                }
+                                HStack {
+                                    TextField("パスワード", text: $passwords[index].value)
+                                        .font(.system(.body, design: .monospaced))
+                                        .autocorrectionDisabled()
+                                        .textInputAutocapitalization(.never)
+                                    
+                                    Button(action: {
+                                        passwords[index].value = PasswordGenerator.generate()
+                                    }) {
+                                        Image(systemName: "arrow.clockwise")
+                                    }
+                                    .buttonStyle(.borderless)
+                                }
                             }
-                            .buttonStyle(.borderless)
+                        }
+                        
+                        Button(action: {
+                            passwords.append(PasswordEntry(label: "パスワード", value: PasswordGenerator.generate()))
+                        }) {
+                            HStack {
+                                Image(systemName: "plus.circle")
+                                Text("パスワードを追加")
+                            }
+                            .font(.footnote)
                         }
                     }
                     
@@ -79,7 +111,7 @@ struct EditVaultItemView: View {
             let payload = try JSONDecoder().decode(SecretPayload.self, from: decryptedData)
             
             self.username = payload.username
-            self.password = payload.password
+            self.passwords = payload.passwords
             self.note = payload.note
             self.isLoading = false
         } catch {
@@ -90,7 +122,7 @@ struct EditVaultItemView: View {
     
     private func save() {
         do {
-            let newPayload = SecretPayload(username: username, password: password, note: note)
+            let newPayload = SecretPayload(username: username, passwords: passwords, note: note)
             let jsonData = try JSONEncoder().encode(newPayload)
             let encrypted = try EncryptionManager.shared.encrypt(jsonData)
             

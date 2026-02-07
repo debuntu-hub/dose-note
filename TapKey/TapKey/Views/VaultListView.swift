@@ -83,7 +83,7 @@ struct VaultListView: View {
         do {
             let decryptedData = try EncryptionManager.shared.decrypt(item.encryptedData)
             let payload = try JSONDecoder().decode(SecretPayload.self, from: decryptedData)
-            ClipboardManager.shared.copy(payload.password)
+            ClipboardManager.shared.copy(payload.primaryPassword)
             withAnimation {
                 copiedItemId = item.id
             }

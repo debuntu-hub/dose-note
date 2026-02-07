@@ -29,32 +29,39 @@ struct VaultDetailView: View {
                 }
                 
                 Section(header: Text("Password")) {
-                    VStack(alignment: .leading, spacing: 10) {
-                        HStack {
-                            if isVisible {
-                                Text(payload.password)
-                                    .font(.system(.body, design: .monospaced))
-                            } else {
-                                Text("••••••••••••••••")
-                                    .font(.system(.body, design: .monospaced))
+                    ForEach(Array(payload.passwords.enumerated()), id: \.element.id) { index, entry in
+                        VStack(alignment: .leading, spacing: 6) {
+                            if payload.passwords.count > 1 {
+                                Text(entry.label)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
                             }
-                            
-                            Spacer()
-                            
-                            Button(action: {
-                                isVisible.toggle()
-                            }) {
-                                Image(systemName: isVisible ? "eye.slash" : "eye")
-                                    .foregroundColor(.secondary)
-                            }
-                            
-                            Divider()
-                                .frame(height: 20)
-                            
-                            Button(action: {
-                                ClipboardManager.shared.copy(payload.password)
-                            }) {
-                                Image(systemName: "doc.on.doc")
+                            HStack {
+                                if isVisible {
+                                    Text(entry.value)
+                                        .font(.system(.body, design: .monospaced))
+                                } else {
+                                    Text("••••••••••••••••")
+                                        .font(.system(.body, design: .monospaced))
+                                }
+                                
+                                Spacer()
+                                
+                                Button(action: {
+                                    isVisible.toggle()
+                                }) {
+                                    Image(systemName: isVisible ? "eye.slash" : "eye")
+                                        .foregroundColor(.secondary)
+                                }
+                                
+                                Divider()
+                                    .frame(height: 20)
+                                
+                                Button(action: {
+                                    ClipboardManager.shared.copy(entry.value)
+                                }) {
+                                    Image(systemName: "doc.on.doc")
+                                }
                             }
                         }
                     }

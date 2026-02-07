@@ -4,7 +4,7 @@ import SwiftUI
 
 @Observable
 class HomeViewModel {
-    var password: String = ""
+    var passwords: [PasswordEntry] = []
     var serviceName: String = ""
     var username: String = ""
     var note: String = ""
@@ -15,17 +15,34 @@ class HomeViewModel {
     var showUpgrade: Bool = false
     
     init() {
-        // 起動時に自動生成
-        generatePassword()
+        // 起動時に自動生成（メインパスワード1つ）
+        passwords = [PasswordEntry(label: "パスワード", value: PasswordGenerator.generate())]
     }
     
-    func generatePassword() {
-        self.password = PasswordGenerator.generate()
+    /// メインパスワード（最初のエントリ）
+    var primaryPassword: String {
+        passwords.first?.value ?? ""
+    }
+    
+    func generatePassword(at index: Int = 0) {
+        guard passwords.indices.contains(index) else { return }
+        passwords[index].value = PasswordGenerator.generate()
         self.isSaved = false
     }
     
-    func copyPassword() {
-        ClipboardManager.shared.copy(password)
+    func addPassword(label: String = "パスワード") {
+        let newEntry = PasswordEntry(label: label, value: PasswordGenerator.generate())
+        passwords.append(newEntry)
+    }
+    
+    func removePassword(at index: Int) {
+        guard passwords.count > 1, passwords.indices.contains(index) else { return }
+        passwords.remove(at: index)
+    }
+    
+    func copyPassword(at index: Int = 0) {
+        guard passwords.indices.contains(index) else { return }
+        ClipboardManager.shared.copy(passwords[index].value)
     }
     
     func copyUsername() {
@@ -48,7 +65,7 @@ class HomeViewModel {
         }
         
         do {
-            let payload = SecretPayload(username: username, password: password, note: note)
+            let payload = SecretPayload(username: username, passwords: passwords, note: note)
             let jsonData = try JSONEncoder().encode(payload)
             let encryptedData = try EncryptionManager.shared.encrypt(jsonData)
             
@@ -75,7 +92,7 @@ class HomeViewModel {
         serviceName = ""
         username = ""
         note = ""
-        generatePassword()
+        passwords = [PasswordEntry(label: "パスワード", value: PasswordGenerator.generate())]
         isSaved = false
     }
 }

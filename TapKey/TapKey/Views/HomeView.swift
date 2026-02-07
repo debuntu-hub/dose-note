@@ -15,47 +15,78 @@ struct HomeView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
-                    // パスワード表示エリア
+                    // パスワード表示エリア（複数対応）
                     VStack(spacing: 16) {
                         Text("生成されたパスワード")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                         
-                        HStack {
-                            Text(viewModel.password)
-                                .font(.system(.title2, design: .monospaced))
-                                .fontWeight(.semibold)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.5)
-                                // 実際は伏せ字にするか要検討だが、生成時は見えた方が良いので表示
-                                // PRDでは「伏せ字」とあるが、コピー前提なので
-                                // タップで表示切り替えなどのUIが良いかも。
-                                // v0.1では簡易的にそのまま表示し、隠すモードをつけるか、
-                                // "••••••••••••••••" とトグルする
-                            
-                            Spacer()
-                            
-                            Button(action: {
-                                viewModel.copyPassword()
-                                let generator = UIImpactFeedbackGenerator(style: .medium)
-                                generator.impactOccurred()
-                            }) {
-                                Image(systemName: "doc.on.doc")
-                                    .font(.title2)
-                                    .padding(8)
+                        ForEach(Array(viewModel.passwords.enumerated()), id: \.element.id) { index, entry in
+                            VStack(alignment: .leading, spacing: 4) {
+                                if viewModel.passwords.count > 1 {
+                                    HStack {
+                                        Text(entry.label)
+                                            .font(.caption2)
+                                            .foregroundStyle(.secondary)
+                                        Spacer()
+                                        if viewModel.passwords.count > 1 {
+                                            Button(action: {
+                                                viewModel.removePassword(at: index)
+                                            }) {
+                                                Image(systemName: "minus.circle.fill")
+                                                    .font(.caption)
+                                                    .foregroundStyle(.red)
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                                HStack {
+                                    Text(entry.value)
+                                        .font(.system(.title3, design: .monospaced))
+                                        .fontWeight(.semibold)
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.5)
+                                    
+                                    Spacer()
+                                    
+                                    Button(action: {
+                                        viewModel.copyPassword(at: index)
+                                        let generator = UIImpactFeedbackGenerator(style: .medium)
+                                        generator.impactOccurred()
+                                    }) {
+                                        Image(systemName: "doc.on.doc")
+                                            .font(.title3)
+                                            .padding(6)
+                                    }
+                                    
+                                    Button(action: {
+                                        viewModel.generatePassword(at: index)
+                                        let generator = UIImpactFeedbackGenerator(style: .light)
+                                        generator.impactOccurred()
+                                    }) {
+                                        Image(systemName: "arrow.clockwise")
+                                            .font(.title3)
+                                            .padding(6)
+                                    }
+                                }
+                                .padding(12)
+                                .background(Color(.secondarySystemBackground))
+                                .cornerRadius(10)
                             }
                         }
-                        .padding()
-                        .background(Color(.secondarySystemBackground))
-                        .cornerRadius(12)
                         
-                        Button("- 再生成 -") {
-                            viewModel.generatePassword()
-                            let generator = UIImpactFeedbackGenerator(style: .light)
-                            generator.impactOccurred()
+                        // パスワード追加ボタン
+                        Button(action: {
+                            viewModel.addPassword()
+                        }) {
+                            HStack {
+                                Image(systemName: "plus.circle")
+                                Text("パスワードを追加")
+                            }
+                            .font(.footnote)
+                            .foregroundStyle(.tint)
                         }
-                        .font(.footnote)
-                        .foregroundStyle(.tint)
                     }
                     .padding(.top)
                     
