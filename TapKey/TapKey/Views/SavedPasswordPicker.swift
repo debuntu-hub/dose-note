@@ -135,7 +135,7 @@ private struct SavedPasswordRow: View {
                                             .font(.caption2)
                                             .foregroundStyle(.secondary)
                                     }
-                                    Text("••••••••••••")
+                                    Text(maskedPassword(entry.value))
                                         .font(.system(.caption, design: .monospaced))
                                         .foregroundStyle(.primary)
                                 }
@@ -167,5 +167,13 @@ private struct SavedPasswordRow: View {
             return
         }
         payload = decoded
+    }
+    
+    /// パスワードの先頭4文字を表示し、残りをマスク
+    private func maskedPassword(_ value: String) -> String {
+        let visible = min(4, value.count)
+        let prefix = String(value.prefix(visible))
+        let masked = String(repeating: "•", count: max(0, value.count - visible))
+        return prefix + masked
     }
 }
