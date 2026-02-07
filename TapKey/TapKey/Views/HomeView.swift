@@ -201,6 +201,9 @@ struct HomeView: View {
             }
         }
         .onAppear {
+            // 既存の保存済みデータからユーザー名候補を収集
+            viewModel.seedUsernamesFromVault(allItems)
+            
             // クリップボードにメールアドレスっぽいものがあればIDに自動入力する（SRS要件）
             if viewModel.username.isEmpty, let clipboardString = UIPasteboard.general.string {
                 // 簡易的なメアド判定

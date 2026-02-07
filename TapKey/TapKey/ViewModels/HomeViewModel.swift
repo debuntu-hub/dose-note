@@ -31,6 +31,32 @@ class HomeViewModel {
         recentUsernames = UserDefaults.standard.stringArray(forKey: Self.recentUsernamesKey) ?? []
     }
     
+    /// 既存の保存済みVaultItemからユーザー名を収集して候補リストに追加
+    func seedUsernamesFromVault(_ items: [VaultItem]) {
+        var currentList = UserDefaults.standard.stringArray(forKey: Self.recentUsernamesKey) ?? []
+        var added = false
+        
+        for item in items {
+            guard let decryptedData = try? EncryptionManager.shared.decrypt(item.encryptedData),
+                  let payload = try? JSONDecoder().decode(SecretPayload.self, from: decryptedData) else {
+                continue
+            }
+            let name = payload.username.trimmingCharacters(in: .whitespaces)
+            guard !name.isEmpty, !currentList.contains(name) else { continue }
+            currentList.append(name)
+            added = true
+        }
+        
+        if added {
+            // 上限を超えたら古いものを削除
+            if currentList.count > Self.maxRecentUsernames {
+                currentList = Array(currentList.prefix(Self.maxRecentUsernames))
+            }
+            UserDefaults.standard.set(currentList, forKey: Self.recentUsernamesKey)
+            recentUsernames = currentList
+        }
+    }
+    
     /// 使用したユーザー名を履歴に追加（使用頻度順に並替え）
     private func saveUsernameToRecent(_ name: String) {
         guard !name.trimmingCharacters(in: .whitespaces).isEmpty else { return }
