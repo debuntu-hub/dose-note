@@ -5,6 +5,7 @@ struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var viewModel = HomeViewModel()
     @Query private var allItems: [VaultItem]
+    @State private var showSavedPicker = false
     @FocusState private var focusedField: Field?
     
     enum Field {
@@ -76,16 +77,32 @@ struct HomeView: View {
                             }
                         }
                         
-                        // パスワード追加ボタン
-                        Button(action: {
-                            viewModel.addPassword()
-                        }) {
-                            HStack {
-                                Image(systemName: "plus.circle")
-                                Text("パスワードを追加")
+                        HStack {
+                            // パスワード追加ボタン
+                            Button(action: {
+                                viewModel.addPassword()
+                            }) {
+                                HStack {
+                                    Image(systemName: "plus.circle")
+                                    Text("パスワードを追加")
+                                }
+                                .font(.footnote)
+                                .foregroundStyle(.tint)
                             }
-                            .font(.footnote)
-                            .foregroundStyle(.tint)
+                            
+                            Spacer()
+                            
+                            // 保存済みから選ぶ（目立たせない）
+                            Button(action: {
+                                showSavedPicker = true
+                            }) {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "tray.full")
+                                    Text("保存済みから選ぶ")
+                                }
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                            }
                         }
                     }
                     .padding(.top)
@@ -198,6 +215,20 @@ struct HomeView: View {
             }
             .sheet(isPresented: $viewModel.showUpgrade) {
                 UpgradeView()
+            }
+            .sheet(isPresented: $showSavedPicker) {
+                SavedPasswordPicker { entry, action in
+                    switch action {
+                    case .apply:
+                        // 選択したパスワードをフォームの先頭に適用
+                        if let index = viewModel.passwords.indices.first {
+                            viewModel.passwords[index].value = entry.value
+                            viewModel.passwords[index].label = entry.label
+                        }
+                    case .copy:
+                        ClipboardManager.shared.copy(entry.value)
+                    }
+                }
             }
         }
         .onAppear {
