@@ -112,6 +112,7 @@ private struct SavedPasswordRow: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
+                .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
             
@@ -147,6 +148,7 @@ private struct SavedPasswordRow: View {
                             }
                             .padding(.vertical, 8)
                             .padding(.leading, 8)
+                            .contentShape(Rectangle())
                         }
                         .buttonStyle(.plain)
                     }
