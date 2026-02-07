@@ -14,9 +14,36 @@ class HomeViewModel {
     var alertMessage: String = ""
     var showUpgrade: Bool = false
     
+    /// よく使うメールアドレス候補
+    var recentUsernames: [String] = []
+    
+    private static let recentUsernamesKey = "tapkey_recent_usernames"
+    private static let maxRecentUsernames = 10
+    
     init() {
         // 起動時に自動生成（メインパスワード1つ）
         passwords = [PasswordEntry(label: "パスワード", value: PasswordGenerator.generate())]
+        // よく使うメールアドレスを読み込み
+        loadRecentUsernames()
+    }
+    
+    func loadRecentUsernames() {
+        recentUsernames = UserDefaults.standard.stringArray(forKey: Self.recentUsernamesKey) ?? []
+    }
+    
+    /// 使用したユーザー名を履歴に追加（使用頻度順に並替え）
+    private func saveUsernameToRecent(_ name: String) {
+        guard !name.trimmingCharacters(in: .whitespaces).isEmpty else { return }
+        var list = UserDefaults.standard.stringArray(forKey: Self.recentUsernamesKey) ?? []
+        // 既存エントリを削除して先頭に挿入（最近使った順）
+        list.removeAll { $0 == name }
+        list.insert(name, at: 0)
+        // 上限を超えたら古いものを削除
+        if list.count > Self.maxRecentUsernames {
+            list = Array(list.prefix(Self.maxRecentUsernames))
+        }
+        UserDefaults.standard.set(list, forKey: Self.recentUsernamesKey)
+        recentUsernames = list
     }
     
     /// メインパスワード（最初のエントリ）
@@ -74,6 +101,7 @@ class HomeViewModel {
             
             // 成功時の処理
             isSaved = true
+            saveUsernameToRecent(username)
             UINotificationFeedbackGenerator().notificationOccurred(.success)
             
             // 保存完了後は遷移またはクリア（仕様に合わせて調整）

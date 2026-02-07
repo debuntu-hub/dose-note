@@ -114,6 +114,31 @@ struct HomeView: View {
                                 .keyboardType(.emailAddress)
                                 .focused($focusedField, equals: .username)
                                 .submitLabel(.next)
+                            
+                            // よく使うメールアドレス候補
+                            if !viewModel.recentUsernames.isEmpty {
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    HStack(spacing: 8) {
+                                        ForEach(viewModel.recentUsernames, id: \.self) { name in
+                                            Button(action: {
+                                                viewModel.username = name
+                                            }) {
+                                                Text(name)
+                                                    .font(.caption)
+                                                    .padding(.horizontal, 10)
+                                                    .padding(.vertical, 5)
+                                                    .background(
+                                                        viewModel.username == name
+                                                            ? Color.blue.opacity(0.15)
+                                                            : Color(.tertiarySystemFill)
+                                                    )
+                                                    .foregroundStyle(viewModel.username == name ? .blue : .primary)
+                                                    .cornerRadius(14)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                         
                         VStack(alignment: .leading, spacing: 5) {
