@@ -1,121 +1,175 @@
 import SwiftUI
 import StoreKit
 
-/// アップグレード案内画面 (§8.6)
-/// 保存件数上限到達時に表示
 struct UpgradeView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var purchaseManager = PurchaseManager.shared
+    @State private var isAnimating = false
     
     var body: some View {
         NavigationStack {
-            VStack(spacing: 24) {
-                Spacer()
-                
-                // Icon
-                Image(systemName: "lock.open.fill")
-                    .font(.system(size: 60))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [.blue, .cyan],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                
-                Text("TapKey Premium")
-                    .font(.title)
-                    .fontWeight(.bold)
-                
-                Text("無料プランの保存上限（\(PurchaseManager.freeLimit)件）に達しました")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                
-                // 機能一覧
-                VStack(alignment: .leading, spacing: 12) {
-                    FeatureRow(icon: "infinity", text: "パスワード保存件数 無制限", highlight: true)
-                    FeatureRow(icon: "rectangle.and.pencil.and.ellipsis", text: "iOS Password AutoFill（将来）", highlight: false)
-                    FeatureRow(icon: "number.circle", text: "TOTP 2段階認証（将来）", highlight: false)
-                    FeatureRow(icon: "square.and.arrow.up", text: "エクスポート / インポート（将来）", highlight: false)
-                }
-                .padding(.horizontal, 24)
-                
-                Spacer()
-                
-                // 買い切り価格表示
-                if let product = purchaseManager.product {
-                    Text("買い切り \(product.displayPrice)")
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                    
-                    Text("一度の購入で永久に使えます。サブスクリプションではありません。")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal)
-                }
-                
-                // 購入ボタン
-                Button(action: {
-                    Task { await purchaseManager.purchase() }
-                }) {
-                    if purchaseManager.isPurchasing {
-                        ProgressView()
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
-                    } else {
-                        Text("Premium を購入")
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
-                    }
-                }
-                .background(
-                    LinearGradient(
-                        colors: [.blue, .cyan],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
+            ZStack {
+                LinearGradient(
+                    colors: [
+                        Color(hex: "0F172A"),
+                        Color(hex: "1E1B4B"),
+                        Color(hex: "312E81")
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
                 )
-                .cornerRadius(14)
-                .disabled(purchaseManager.isPurchasing || purchaseManager.product == nil)
-                .padding(.horizontal, 32)
+                .ignoresSafeArea()
                 
-                // 復元ボタン
-                Button("購入を復元") {
-                    Task { await purchaseManager.restorePurchases() }
+                Circle()
+                    .fill(Color(hex: "F59E0B").opacity(0.06))
+                    .frame(width: 300, height: 300)
+                    .offset(x: 130, y: -250)
+                    .blur(radius: 70)
+                
+                ScrollView {
+                    VStack(spacing: 28) {
+                        Spacer(minLength: 20)
+                        
+                        ZStack {
+                            Circle()
+                                .fill(Color(hex: "F59E0B").opacity(0.15))
+                                .frame(width: 120, height: 120)
+                                .scaleEffect(isAnimating ? 1.08 : 1.0)
+                                .animation(
+                                    .easeInOut(duration: 2).repeatForever(autoreverses: true),
+                                    value: isAnimating
+                                )
+                            
+                            Image(systemName: "crown.fill")
+                                .font(.system(size: 50))
+                                .foregroundStyle(
+                                    LinearGradient(
+                                        colors: [Color(hex: "F59E0B"), Color(hex: "FBBF24")],
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    )
+                                )
+                                .shadow(color: Color(hex: "F59E0B").opacity(0.3), radius: 10)
+                        }
+                        
+                        VStack(spacing: 8) {
+                            Text("TapKey Premium")
+                                .font(.system(size: 28, weight: .bold, design: .rounded))
+                                .foregroundColor(.white)
+                            
+                            Text("保存上限（\(PurchaseManager.freeLimit)件）を解除")
+                                .font(.subheadline)
+                                .foregroundStyle(.white.opacity(0.6))
+                        }
+                        
+                        VStack(spacing: 16) {
+                            PremiumFeatureRow(icon: "infinity", text: "パスワード保存 無制限", active: true)
+                            PremiumFeatureRow(icon: "rectangle.and.pencil.and.ellipsis", text: "iOS Password AutoFill", active: false)
+                            PremiumFeatureRow(icon: "number.circle", text: "TOTP 2段階認証", active: false)
+                            PremiumFeatureRow(icon: "square.and.arrow.up", text: "エクスポート / インポート", active: false)
+                        }
+                        .padding(.horizontal, 8)
+                        
+                        Spacer(minLength: 10)
+                        
+                        if let product = purchaseManager.product {
+                            VStack(spacing: 4) {
+                                Text("買い切り \(product.displayPrice)")
+                                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                                    .foregroundColor(.white)
+                                
+                                Text("一度の購入で永久に使えます")
+                                    .font(.caption)
+                                    .foregroundStyle(.white.opacity(0.4))
+                            }
+                        }
+                        
+                        Button(action: {
+                            Task { await purchaseManager.purchase() }
+                        }) {
+                            if purchaseManager.isPurchasing {
+                                ProgressView()
+                                    .tint(.white)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 18)
+                            } else {
+                                Text("Premium を購入")
+                                    .font(.headline)
+                                    .foregroundColor(Color(hex: "1E1B4B"))
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 18)
+                            }
+                        }
+                        .background(
+                            LinearGradient(
+                                colors: [Color(hex: "F59E0B"), Color(hex: "FBBF24")],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .shadow(color: Color(hex: "F59E0B").opacity(0.3), radius: 12, x: 0, y: 6)
+                        .disabled(purchaseManager.isPurchasing || purchaseManager.product == nil)
+                        .padding(.horizontal, 8)
+                        
+                        Button("購入を復元") {
+                            Task { await purchaseManager.restorePurchases() }
+                        }
+                        .font(.caption)
+                        .foregroundStyle(.white.opacity(0.4))
+                        .padding(.bottom, 24)
+                    }
+                    .padding(.horizontal, 24)
                 }
-                .font(.caption)
-                .padding(.bottom, 24)
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("閉じる") { dismiss() }
+                    Button(action: { dismiss() }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.title3)
+                            .foregroundStyle(.white.opacity(0.4))
+                    }
                 }
             }
             .onChange(of: purchaseManager.isPremium) { _, newValue in
                 if newValue { dismiss() }
             }
+            .onAppear { isAnimating = true }
         }
     }
 }
 
-struct FeatureRow: View {
+private struct PremiumFeatureRow: View {
     let icon: String
     let text: String
-    let highlight: Bool
+    let active: Bool
     
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 14) {
             Image(systemName: icon)
                 .font(.body)
-                .foregroundStyle(highlight ? .blue : .secondary)
-                .frame(width: 24)
+                .foregroundStyle(active ? Color(hex: "F59E0B") : .white.opacity(0.3))
+                .frame(width: 28)
+            
             Text(text)
                 .font(.body)
-                .foregroundStyle(highlight ? .primary : .secondary)
+                .foregroundStyle(active ? .white : .white.opacity(0.3))
+            
+            Spacer()
+            
+            if !active {
+                Text("将来")
+                    .font(.caption2.weight(.medium))
+                    .foregroundStyle(.white.opacity(0.3))
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 2)
+                    .background(.white.opacity(0.08))
+                    .clipShape(Capsule())
+            }
         }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(.white.opacity(active ? 0.08 : 0.03))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }

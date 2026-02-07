@@ -1,10 +1,3 @@
-//
-//  ContentView.swift
-//  TapKey
-//
-//  Created by 友清秀和 on 2026/02/06.
-//
-
 import SwiftUI
 import SwiftData
 
@@ -15,22 +8,23 @@ struct ContentView: View {
         TabView(selection: $selection) {
             HomeView()
                 .tabItem {
-                    Label("Generate", systemImage: "key.fill")
+                    Label("生成", systemImage: "wand.and.stars")
                 }
                 .tag(0)
             
             VaultListView()
                 .tabItem {
-                    Label("Vault", systemImage: "tray.full.fill")
+                    Label("保管庫", systemImage: "lock.shield.fill")
                 }
                 .tag(1)
             
             SettingsView()
                 .tabItem {
-                    Label("Settings", systemImage: "gear")
+                    Label("設定", systemImage: "gearshape.fill")
                 }
                 .tag(2)
         }
+        .tint(AppTheme.accent)
     }
 }
 

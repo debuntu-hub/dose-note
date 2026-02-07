@@ -1,11 +1,8 @@
 import SwiftUI
 
 struct SettingsView: View {
-    // クリップボードクリア時間（秒）
     @AppStorage("clipboardClearSeconds") private var clipboardClearSeconds: Int = 30
-    // 自動ロック設定（バックグラウンド移行後の秒数、0=即時）
     @AppStorage("autoLockSeconds") private var autoLockSeconds: Int = 0
-    // オンボーディング
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = true
     
     let clipboardOptions = [10, 15, 30, 60, 90, 120]
@@ -14,91 +11,97 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             List {
-                // セキュリティ
-                Section(header: Text("セキュリティ")) {
-                    // 生体認証（常時ON、情報表示のみ）
-                    HStack {
-                        Label("生体認証ロック", systemImage: "faceid")
+                Section {
+                    HStack(spacing: 14) {
+                        SettingsIcon(icon: "faceid", color: Color(hex: "10B981"))
+                        Text("生体認証ロック")
                         Spacer()
                         Text("ON")
-                            .foregroundStyle(.secondary)
+                            .font(.subheadline)
+                            .foregroundStyle(.green)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 3)
+                            .background(.green.opacity(0.12))
+                            .clipShape(Capsule())
                     }
                     
-                    // 自動ロック時間
-                    Picker(selection: $autoLockSeconds) {
-                        ForEach(autoLockOptions, id: \.self) { sec in
-                            Text(autoLockLabel(sec)).tag(sec)
+                    HStack(spacing: 14) {
+                        SettingsIcon(icon: "lock.fill", color: AppTheme.accent)
+                        Picker("自動ロック", selection: $autoLockSeconds) {
+                            ForEach(autoLockOptions, id: \.self) { sec in
+                                Text(autoLockLabel(sec)).tag(sec)
+                            }
                         }
-                    } label: {
-                        Label("自動ロック", systemImage: "lock.fill")
                     }
+                } header: {
+                    Label("セキュリティ", systemImage: "shield.fill")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(AppTheme.accent)
                 }
                 
-                // クリップボード
-                Section(header: Text("クリップボード")) {
-                    Picker(selection: $clipboardClearSeconds) {
-                        ForEach(clipboardOptions, id: \.self) { sec in
-                            Text("\(sec)秒").tag(sec)
+                Section {
+                    HStack(spacing: 14) {
+                        SettingsIcon(icon: "clipboard.fill", color: Color(hex: "F59E0B"))
+                        Picker("自動クリア", selection: $clipboardClearSeconds) {
+                            ForEach(clipboardOptions, id: \.self) { sec in
+                                Text("\(sec)秒").tag(sec)
+                            }
                         }
-                    } label: {
-                        Label("自動クリア", systemImage: "clipboard")
                     }
                     
                     Text("コピー後、指定秒数でクリップボードを自動クリアします")
                         .font(.caption)
+                        .foregroundStyle(.tertiary)
+                        .listRowBackground(Color.clear)
+                } header: {
+                    Label("クリップボード", systemImage: "doc.on.clipboard.fill")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Color(hex: "F59E0B"))
+                }
+                
+                Section {
+                    HStack(spacing: 14) {
+                        SettingsIcon(icon: "square.and.arrow.up", color: .secondary)
+                        Text("エクスポート / インポート")
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        Text("v1.0")
+                            .font(.caption.weight(.medium))
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 3)
+                            .background(Color.secondary.opacity(0.12))
+                            .clipShape(Capsule())
+                    }
+                } header: {
+                    Label("データ管理", systemImage: "cylinder.split.1x2.fill")
+                        .font(.caption.weight(.semibold))
                         .foregroundStyle(.secondary)
                 }
                 
-                // データ管理
-                Section(header: Text("データ管理")) {
-                    // エクスポート/インポート（v1.0以降）
-                    HStack {
-                        Label("エクスポート / インポート", systemImage: "square.and.arrow.up")
-                        Spacer()
-                        Text("v1.0")
-                            .font(.caption)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 2)
-                            .background(Color.secondary.opacity(0.2))
-                            .cornerRadius(4)
-                    }
-                    .foregroundStyle(.secondary)
+                Section {
+                    InfoRow(label: "バージョン", value: "v0.1")
+                    InfoRow(label: "データ保存", value: "ローカルのみ")
+                    InfoRow(label: "暗号化", value: "AES-256-GCM")
+                } header: {
+                    Label("アプリ情報", systemImage: "info.circle.fill")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
                 }
                 
-                // アプリ情報
-                Section(header: Text("アプリ情報")) {
-                    HStack {
-                        Text("バージョン")
-                        Spacer()
-                        Text("v0.1")
-                            .foregroundStyle(.secondary)
-                    }
-                    
-                    HStack {
-                        Text("データ保存")
-                        Spacer()
-                        Text("ローカルのみ")
-                            .foregroundStyle(.secondary)
-                    }
-                    
-                    HStack {
-                        Text("暗号化")
-                        Spacer()
-                        Text("AES-256-GCM")
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                
-                // リセット
                 Section {
                     Button(action: {
                         hasCompletedOnboarding = false
                     }) {
-                        Label("ガイダンスを再表示", systemImage: "questionmark.circle")
+                        HStack(spacing: 14) {
+                            SettingsIcon(icon: "questionmark.circle", color: Color(hex: "8B5CF6"))
+                            Text("ガイダンスを再表示")
+                                .foregroundStyle(.primary)
+                        }
                     }
                 }
             }
-            .navigationTitle("Settings")
+            .listStyle(.insetGrouped)
+            .navigationTitle("設定")
         }
     }
     
@@ -111,6 +114,34 @@ struct SettingsView: View {
         case 60: return "1分"
         case 300: return "5分"
         default: return "\(seconds)秒"
+        }
+    }
+}
+
+private struct SettingsIcon: View {
+    let icon: String
+    let color: Color
+    
+    var body: some View {
+        Image(systemName: icon)
+            .font(.callout)
+            .foregroundColor(.white)
+            .frame(width: 30, height: 30)
+            .background(color)
+            .clipShape(RoundedRectangle(cornerRadius: 7))
+    }
+}
+
+private struct InfoRow: View {
+    let label: String
+    let value: String
+    
+    var body: some View {
+        HStack {
+            Text(label)
+            Spacer()
+            Text(value)
+                .foregroundStyle(.secondary)
         }
     }
 }
