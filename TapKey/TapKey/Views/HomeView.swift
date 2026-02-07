@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import UIKit
 
 struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
@@ -7,6 +8,7 @@ struct HomeView: View {
     @Query private var allItems: [VaultItem]
     @State private var showSavedPicker = false
     @FocusState private var focusedField: Field?
+    var switchToVault: (() -> Void)?
     
     enum Field {
         case serviceName, username, note
@@ -211,6 +213,7 @@ struct HomeView: View {
                 }
                 Button("一覧を見る") {
                     viewModel.reset()
+                    switchToVault?()
                 }
             }
             .sheet(isPresented: $viewModel.showUpgrade) {
@@ -259,6 +262,6 @@ struct HomeView: View {
 }
 
 #Preview {
-    HomeView()
+    HomeView(switchToVault: {})
         .modelContainer(for: VaultItem.self, inMemory: true)
 }

@@ -6,7 +6,7 @@ struct ContentView: View {
     
     var body: some View {
         TabView(selection: $selection) {
-            HomeView()
+            HomeView(switchToVault: { selection = 1 })
                 .tabItem {
                     Label("生成", systemImage: "wand.and.stars")
                 }
