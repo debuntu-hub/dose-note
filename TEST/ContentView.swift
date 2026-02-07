@@ -310,6 +310,7 @@ struct HistoryView: View {
         .navigationTitle("History View Title".localized)
         .sheet(isPresented: $showingPaywall) {
             PaywallView(store: store)
+                .environmentObject(storeManager)
         }
     }
 }

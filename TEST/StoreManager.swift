@@ -59,7 +59,7 @@ class StoreManager: ObservableObject {
     // MARK: - Purchasing
     
     func purchase(_ product: Product) async throws {
-        await MainActor.run { debugStatus = "Starting purchase..." }
+        debugStatus = "Starting purchase..."
         
         // Prevent multiple simultaneous purchase attempts
         guard !isPurchasing else {
@@ -69,7 +69,7 @@ class StoreManager: ObservableObject {
         
         isPurchasing = true
         purchaseErrorMessage = nil
-        await MainActor.run { debugStatus = "Purchasing..." }
+        debugStatus = "Purchasing..."
         
         // Ensure isPurchasing is reset after the function returns (even if it throws)
         defer {
@@ -84,16 +84,14 @@ class StoreManager: ObservableObject {
             switch result {
             case .success(let verification):
                 print("[StoreManager] Purchase result: success")
-                await MainActor.run { debugStatus = "Purchase success. Verifying..." }
+                debugStatus = "Purchase success. Verifying..."
                 
                 // Check if the transaction is verified
                 let transaction = try checkVerified(verification)
                 
                 // TRUST THE TRANSACTION IMMEDIATELY
-                await MainActor.run { 
-                    self.isPremium = true 
-                    self.debugStatus = "Purchase confirmed. Updating Entitlements..."
-                }
+                self.isPremium = true 
+                self.debugStatus = "Purchase confirmed. Updating Entitlements..."
 
                 // The transaction is verified. Deliver content to the user.
                 await updateCustomerProductStatus()
@@ -101,26 +99,26 @@ class StoreManager: ObservableObject {
                 // Always finish a transaction.
                 await transaction.finish()
                 print("[StoreManager] Transaction finished successfully")
-                await MainActor.run { debugStatus = "Transaction finished. Premium: \(isPremium)" }
+                debugStatus = "Transaction finished. Premium: \(isPremium)"
                 
             case .userCancelled:
                 print("[StoreManager] Purchase result: userCancelled")
-                await MainActor.run { debugStatus = "Result: User Cancelled (Check StoreKit config)" }
+                debugStatus = "Result: User Cancelled (Check StoreKit config)"
                 break
             case .pending:
                 print("[StoreManager] Purchase result: pending")
-                await MainActor.run { debugStatus = "Result: Pending (Parental control?)" }
+                debugStatus = "Result: Pending (Parental control?)"
                 break
             @unknown default:
                 print("[StoreManager] Purchase result: unknown")
-                await MainActor.run { debugStatus = "Result: Unknown" }
+                debugStatus = "Result: Unknown"
                 break
             }
         } catch {
             print("[StoreManager] Purchase error: \(error.localizedDescription)")
             // Update error message so the View can display it
             self.purchaseErrorMessage = error.localizedDescription
-            await MainActor.run { debugStatus = "Error: \(error.localizedDescription)" }
+            debugStatus = "Error: \(error.localizedDescription)"
             self.purchaseErrorMessage = error.localizedDescription
             throw error
         }
@@ -154,10 +152,8 @@ class StoreManager: ObservableObject {
         }
         
         let finalStatus = foundActive
-        await MainActor.run {
-            self.isPremium = finalStatus
-            print("[StoreManager] updateCustomerProductStatus complete. isPremium: \(finalStatus)")
-        }
+        self.isPremium = finalStatus
+        print("[StoreManager] updateCustomerProductStatus complete. isPremium: \(finalStatus)")
     }
     
     func requestProducts() async {

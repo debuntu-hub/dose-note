@@ -13,7 +13,12 @@ final class DoseStore: ObservableObject {
     private let storageKey = "doses_history"
     
     init() {
-        load()
+        // _doses に直接代入することで didSet（save()）が init 中に発火するのを防ぐ
+        let key = "doses_history"
+        if let data = UserDefaults.standard.data(forKey: key),
+           let decoded = try? JSONDecoder().decode([Dose].self, from: data) {
+            _doses = Published(wrappedValue: decoded)
+        }
     }
     
     // MARK: - Actions

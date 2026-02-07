@@ -1,6 +1,9 @@
 import Foundation
 
-struct Dose: Identifiable, Codable {
+// nonisolated: @MainActor デフォルト分離の影響を受けないようにし、
+// Codable の合成メソッド (init(from:) / encode(to:)) が
+// JSONEncoder/JSONDecoder から安全に呼び出せるようにする
+nonisolated struct Dose: Identifiable, Codable, Sendable {
     let id: UUID
     var date: Date
     
