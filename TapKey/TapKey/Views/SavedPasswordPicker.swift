@@ -88,6 +88,7 @@ private struct SavedPasswordRow: View {
     
     @State private var payload: SecretPayload?
     @State private var isExpanded = false
+    @State private var visiblePasswords: Set<UUID> = []
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -135,12 +136,28 @@ private struct SavedPasswordRow: View {
                                             .font(.caption2)
                                             .foregroundStyle(.secondary)
                                     }
-                                    Text(maskedPassword(entry.value))
+                                    Text(visiblePasswords.contains(entry.id) ? entry.value : maskedPassword(entry.value))
                                         .font(.system(.caption, design: .monospaced))
                                         .foregroundStyle(.primary)
                                 }
                                 
                                 Spacer()
+                                
+                                Button(action: {
+                                    withAnimation(.easeInOut(duration: 0.15)) {
+                                        if visiblePasswords.contains(entry.id) {
+                                            visiblePasswords.remove(entry.id)
+                                        } else {
+                                            visiblePasswords.insert(entry.id)
+                                        }
+                                    }
+                                }) {
+                                    Image(systemName: visiblePasswords.contains(entry.id) ? "eye.slash" : "eye")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                        .frame(width: 28, height: 28)
+                                }
+                                .buttonStyle(.borderless)
                                 
                                 Image(systemName: "chevron.right")
                                     .font(.caption2)
