@@ -334,12 +334,12 @@
 - **次のステップ**:
   - [x] StoreKit設定ファイル作成（App Store Connect連携前のローカルテスト用）
   - [x] Xcodeプロジェクトでの設定（Product > Scheme > Edit Scheme > Run > Options > StoreKit Configuration で選択）
-  - [ ] **Xcodeでビルド確認**（UIリデザイン後のコンパイルチェック）
+  - [x] **Xcodeでビルド確認**（UIリデザイン後のコンパイルチェック） ✅ 完了
   - [ ] App Store Connect設定（製品ID登録、スクリーンショット、メタデータ）
   - [ ] TestFlightテスト配信
 - **v0.2以降の機能**:
   - [ ] CSVエクスポート/インポート
-  - [ ] 保存後の一覧タブ自動切り替え
+  - [x] 保存後の一覧タブ自動切り替え ✅ 実装済み
   - [ ] iOS Password AutoFill対応
 
 ### 【Phase 6】会社OS自動化（銀行API連携）
