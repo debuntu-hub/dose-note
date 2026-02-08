@@ -37,19 +37,20 @@ struct SettingsView: View {
                 }
                 
                 Section {
-                    HStack(spacing: 14) {
-                        SettingsIcon(icon: "clipboard.fill", color: Color(hex: "F59E0B"))
-                        Picker("自動クリア", selection: $clipboardClearSeconds) {
-                            ForEach(clipboardOptions, id: \.self) { sec in
-                                Text("\(sec)秒").tag(sec)
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack(spacing: 14) {
+                            SettingsIcon(icon: "clipboard.fill", color: Color(hex: "F59E0B"))
+                            Picker("自動クリア", selection: $clipboardClearSeconds) {
+                                ForEach(clipboardOptions, id: \.self) { sec in
+                                    Text("\(sec)秒").tag(sec)
+                                }
                             }
                         }
+                        
+                        Text("コピー後、指定秒数でクリップボードを自動クリアします")
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
                     }
-                    
-                    Text("コピー後、指定秒数でクリップボードを自動クリアします")
-                        .font(.caption)
-                        .foregroundStyle(.tertiary)
-                        .listRowBackground(Color.clear)
                 } header: {
                     Label("クリップボード", systemImage: "doc.on.clipboard.fill")
                         .font(.caption.weight(.semibold))
