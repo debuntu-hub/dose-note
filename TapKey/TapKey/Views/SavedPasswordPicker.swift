@@ -69,7 +69,7 @@ struct SavedPasswordPicker: View {
                                             .font(.subheadline.weight(.semibold))
                                             .foregroundStyle(.primary)
                                         
-                                        Text(maskedPassword(item.entry.value))
+                                        Text(item.entry.value)
                                             .font(.system(.caption, design: .monospaced))
                                             .foregroundStyle(.primary)
                                         
@@ -159,13 +159,5 @@ struct SavedPasswordPicker: View {
         }
         decryptedEntries = entries
         isLoading = false
-    }
-    
-    /// パスワードの先頭4文字を表示し、残りをマスク
-    private func maskedPassword(_ value: String) -> String {
-        let visible = min(4, value.count)
-        let prefix = String(value.prefix(visible))
-        let masked = String(repeating: "•", count: max(0, value.count - visible))
-        return prefix + masked
     }
 }
