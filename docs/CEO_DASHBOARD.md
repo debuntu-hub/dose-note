@@ -8,7 +8,7 @@
 | プロジェクト | フェーズ | 状態 |
 |---|---|---|
 | **Dose Note** | RELEASE | ✅ 審査再提出済み |
-| **TapKey** | TESTING | ✅ TestFlight動作確認済み |
+| **TapKey** | RELEASE | ✅ App Store審査提出済み |
 | **会社OS** | OPS | 銀行API連携完了 |
 
 ---
@@ -32,27 +32,31 @@
 - [x] App Store Connect でアプリ登録
 - [x] NSFaceIDUsageDescription追加（TCCクラッシュ修正）✅
 - [x] 再アーカイブ・TestFlight動作確認 ✅
-- [ ] スクリーンショット撮影（6.7 / 6.5 / 5.5インチ）
-- [ ] メタデータ入力（タイトル・説明文・キーワード）
-- [ ] 審査提出
+- [x] スクリーンショット撮影・アップロード ✅
+- [x] メタデータ入力（タイトル・説明文・キーワード）✅
+- [x] 審査提出（2026年2月8日）✅
 
 ---
 
 ## 🚀 進行中のプロジェクト詳細
 
 ### 【TapKey】パスワードマネージャー
-- **仕様書**: [TAPKEY_SPEC.md](./TAPKEY_SPEC.md)
-- **進捗**: v0.1 実装完了・UIリデザイン済み (2026-02-07)
+- **仕様書**: [TapKey/docs/](../TapKey/docs/)
+- **進捗**: v1.0 App Store審査提出済み (2026-02-08)
+- **サポートページ**: https://debuntu-hub.github.io/tapkey-app/
 
 **次のステップ**:
-1. App Store Connect設定
-2. TestFlight配信
-3. ※ CSVインポート、AutoFillはv0.2へ
+1. 審査結果待ち
+2. 承認後リリース
+3. ※ CSVインポート、AutoFillはv2.0へ
 
 ---
 
 ## 🎉 最近の完了事項 (Archive)
 
+- **2026-02-08**: TapKey v1.0 App Store審査提出
+- **2026-02-08**: TapKey プライバシーポリシー・サポートページ公開（GitHub Pages）
+- **2026-02-08**: TapKey 生体認証デフォルトOFF・ACL動的切替実装
 - **2026-02-08**: Dose Note 審査再提出・TapKey App Store Connect登録
 - **2026-02-08**: Dose Note 再アーカイブ・TestFlight動作確認完了
 - **2026-02-07**: 会社OS Phase 6完了（銀行API連携・MCP実装）
@@ -96,8 +100,8 @@
 
 ### 今期の焦点
 **リリースと収益化の開始**
-- Dose Note: リリース → 最初の100円
-- TapKey: TestFlight → リリース
+- Dose Note: 審査結果待ち → 最初の100円
+- TapKey: 審査結果待ち → リリース
 
 ---
 
