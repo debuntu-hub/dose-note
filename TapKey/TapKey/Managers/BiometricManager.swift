@@ -11,19 +11,33 @@ class BiometricManager {
     var isBiometricEnabled: Bool {
         get { UserDefaults.standard.bool(forKey: "isBiometricEnabled") }
         set {
+            let oldValue = isBiometricEnabled
             UserDefaults.standard.set(newValue, forKey: "isBiometricEnabled")
+            EncryptionManager.shared.requireBiometricForKeychain = newValue
             if !newValue {
                 // OFFにしたら即ロック解除
                 isLocked = false
+            }
+            // トグル変更時にKeychainキーのACLを切り替え
+            if oldValue != newValue {
+                do {
+                    try EncryptionManager.shared.reSaveKey(requireBiometric: newValue)
+                } catch {
+                    print("Failed to migrate key ACL: \(error)")
+                }
             }
         }
     }
     
     init() {
-        // 初回起動時はデフォルトON
-        if UserDefaults.standard.object(forKey: "isBiometricEnabled") == nil {
-            UserDefaults.standard.set(true, forKey: "isBiometricEnabled")
+        // v1.1 マイグレーション: デフォルトをOFFに変更（既存ユーザーも含む）
+        let migrationKey = "biometricDefault_v1_1_migrated"
+        if !UserDefaults.standard.bool(forKey: migrationKey) {
+            UserDefaults.standard.set(false, forKey: "isBiometricEnabled")
+            UserDefaults.standard.set(true, forKey: migrationKey)
         }
+        // EncryptionManagerに現在の生体認証設定を反映
+        EncryptionManager.shared.requireBiometricForKeychain = isBiometricEnabled
         // 生体認証が無効ならロック解除状態で開始
         if !isBiometricEnabled {
             isLocked = false

@@ -17,28 +17,33 @@ class KeychainHelper {
     
     private init() {}
     
-    func saveKey(_ data: Data) throws {
-        // 生体認証が必要なACL設定
-        var error: Unmanaged<CFError>?
-        guard let accessControl = SecAccessControlCreateWithFlags(
-            kCFAllocatorDefault,
-            kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly,
-            .biometryAny, // FaceID / TouchID 必須
-            &error
-        ) else {
-            throw KeychainError.accessControlSetupFailed
-        }
+    func saveKey(_ data: Data, requireBiometric: Bool = true) throws {
+        // 既存削除（上書きのため）
+        deleteKey()
         
-        let query: [String: Any] = [
+        var query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
             kSecAttrAccount as String: account,
             kSecValueData as String: data,
-            kSecAttrAccessControl as String: accessControl
         ]
         
-        // 既存削除（上書きのため）
-        SecItemDelete(query as CFDictionary)
+        if requireBiometric {
+            // 生体認証が必要なACL設定
+            var error: Unmanaged<CFError>?
+            guard let accessControl = SecAccessControlCreateWithFlags(
+                kCFAllocatorDefault,
+                kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly,
+                .biometryAny, // FaceID / TouchID 必須
+                &error
+            ) else {
+                throw KeychainError.accessControlSetupFailed
+            }
+            query[kSecAttrAccessControl as String] = accessControl
+        } else {
+            // 生体認証なし — パスコード保護のみ
+            query[kSecAttrAccessible as String] = kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly
+        }
         
         let status = SecItemAdd(query as CFDictionary, nil)
         guard status == errSecSuccess else {

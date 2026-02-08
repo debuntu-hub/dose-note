@@ -9,11 +9,18 @@ class EncryptionManager {
     static let shared = EncryptionManager()
     private var symmetricKey: SymmetricKey?
     
+    /// Keychainへの保存時に生体認証ACLを付与するか（BiometricManagerから設定される）
+    var requireBiometricForKeychain: Bool = false
+    
+    /// セッション中にキーのACL再保存を行ったかどうか
+    private var hasReSavedACL = false
+    
     private init() {}
     
     // アプリロック時などにメモリ上のキーを破棄する
     func clearKey() {
         self.symmetricKey = nil
+        self.hasReSavedACL = false
     }
     
     // キーの準備（なければ生成して保存、あればロード）
@@ -24,15 +31,34 @@ class EncryptionManager {
         do {
             let keyData = try KeychainHelper.shared.loadKey()
             self.symmetricKey = SymmetricKey(data: keyData)
+            
+            // ACLマイグレーション: 現在の設定に合わせてキーを再保存（セッション中1回のみ）
+            if !hasReSavedACL {
+                hasReSavedACL = true
+                KeychainHelper.shared.deleteKey()
+                try KeychainHelper.shared.saveKey(keyData, requireBiometric: requireBiometricForKeychain)
+            }
         } catch KeychainError.notFound {
             // 新規生成
             let newKey = SymmetricKey(size: .bits256)
             let keyData = newKey.withUnsafeBytes { Data($0) }
-            try KeychainHelper.shared.saveKey(keyData)
+            try KeychainHelper.shared.saveKey(keyData, requireBiometric: requireBiometricForKeychain)
             self.symmetricKey = newKey
+            hasReSavedACL = true
         } catch {
             throw error
         }
+    }
+    
+    /// 生体認証トグル変更時にキーのACLを切り替える
+    func reSaveKey(requireBiometric: Bool) throws {
+        try prepareKey()
+        guard let key = symmetricKey else { return }
+        let keyData = key.withUnsafeBytes { Data($0) }
+        KeychainHelper.shared.deleteKey()
+        try KeychainHelper.shared.saveKey(keyData, requireBiometric: requireBiometric)
+        self.requireBiometricForKeychain = requireBiometric
+        hasReSavedACL = true
     }
     
     func encrypt(_ data: Data) throws -> Data {

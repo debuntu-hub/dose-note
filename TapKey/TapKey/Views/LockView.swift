@@ -111,11 +111,7 @@ struct LockView: View {
         }
         .onAppear {
             isAnimating = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                if manager.isLocked {
-                    manager.unlock()
-                }
-            }
+            // ユーザーが「ロック解除」ボタンをタップするまでFaceIDを自動起動しない
         }
     }
 }
