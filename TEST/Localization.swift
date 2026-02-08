@@ -1,6 +1,6 @@
 import Foundation
 
-enum Language {
+nonisolated enum Language: Sendable {
     case japanese
     case english
     
@@ -12,7 +12,7 @@ enum Language {
     }
 }
 
-struct L10n {
+nonisolated struct L10n: Sendable {
     static func get(_ key: String) -> String {
         let lang = Language.current
         return translations[key]?[lang] ?? key

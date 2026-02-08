@@ -99,7 +99,7 @@ final class DoseStore: ObservableObject {
 
     // MARK: - Graph Data
     
-    struct IntervalDataPoint: Identifiable {
+    nonisolated struct IntervalDataPoint: Identifiable, Sendable {
         let id = UUID()
         let date: Date
         let intervalDays: Double
@@ -128,13 +128,6 @@ final class DoseStore: ObservableObject {
     private func save() {
         if let encoded = try? JSONEncoder().encode(doses) {
             UserDefaults.standard.set(encoded, forKey: storageKey)
-        }
-    }
-    
-    private func load() {
-        if let data = UserDefaults.standard.data(forKey: storageKey),
-           let decoded = try? JSONDecoder().decode([Dose].self, from: data) {
-            doses = decoded
         }
     }
 }
