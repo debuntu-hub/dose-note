@@ -229,12 +229,12 @@ struct HomeView: View {
                 SavedPasswordPicker { entry, action in
                     switch action {
                     case .apply:
-                        // パスワードが1つだけで未編集（デフォルト生成状態）なら上書き、
+                        // 最後のパスワードがデフォルトラベル「パスワード」なら上書き（追加直後の状態）
                         // それ以外は新しいエントリとして追加
-                        if viewModel.passwords.count == 1,
-                           viewModel.passwords[0].label == "パスワード" {
-                            viewModel.passwords[0].value = entry.value
-                            viewModel.passwords[0].label = entry.label
+                        if let lastIndex = viewModel.passwords.indices.last,
+                           viewModel.passwords[lastIndex].label == "パスワード" {
+                            viewModel.passwords[lastIndex].value = entry.value
+                            viewModel.passwords[lastIndex].label = entry.label
                         } else {
                             viewModel.passwords.append(PasswordEntry(label: entry.label, value: entry.value))
                         }
