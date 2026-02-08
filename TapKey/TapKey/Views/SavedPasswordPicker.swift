@@ -2,12 +2,14 @@ import SwiftUI
 import SwiftData
 
 /// 保存済みパスワードから選択するピッカー
-/// 設計原則: 自動表示なし・推奨なし・頻度順なし → 責任は完全にユーザー側
+/// フラット一覧で全パスワードを即座に選択可能
 struct SavedPasswordPicker: View {
     @Environment(\.dismiss) private var dismiss
     @Query(sort: \VaultItem.title) private var items: [VaultItem]
     @State private var searchText = ""
-    @State private var selectedPayload: (title: String, entry: PasswordEntry)?
+    @State private var decryptedEntries: [DecryptedEntry] = []
+    @State private var isLoading = true
+    @State private var selectedEntry: DecryptedEntry?
     @State private var showConfirmation = false
     
     /// 選択結果を返すコールバック
@@ -18,37 +20,90 @@ struct SavedPasswordPicker: View {
         case copy    // クリップボードにコピー
     }
     
-    var filteredItems: [VaultItem] {
+    /// 復号済みのパスワード情報
+    struct DecryptedEntry: Identifiable {
+        let id = UUID()
+        let serviceName: String
+        let username: String
+        let entry: PasswordEntry
+    }
+    
+    var filteredEntries: [DecryptedEntry] {
         if searchText.isEmpty {
-            return items
+            return decryptedEntries
         } else {
-            return items.filter { $0.title.localizedStandardContains(searchText) }
+            return decryptedEntries.filter {
+                $0.serviceName.localizedStandardContains(searchText) ||
+                $0.entry.label.localizedStandardContains(searchText)
+            }
         }
     }
     
     var body: some View {
         NavigationStack {
-            List {
-                if items.isEmpty {
+            Group {
+                if isLoading {
+                    ProgressView("読み込み中...")
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if decryptedEntries.isEmpty {
                     ContentUnavailableView(
                         "保存済みパスワードがありません",
                         systemImage: "key.slash",
                         description: Text("まずパスワードを保存してください。")
                     )
                 } else {
-                    ForEach(filteredItems) { item in
-                        SavedPasswordRow(item: item) { title, entry in
-                            selectedPayload = (title: title, entry: entry)
-                            showConfirmation = true
+                    List {
+                        ForEach(filteredEntries) { item in
+                            Button(action: {
+                                selectedEntry = item
+                                showConfirmation = true
+                            }) {
+                                HStack(spacing: 12) {
+                                    Image(systemName: "key.fill")
+                                        .font(.callout)
+                                        .foregroundStyle(AppTheme.accent)
+                                        .frame(width: 24)
+                                    
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(item.serviceName)
+                                            .font(.subheadline.weight(.semibold))
+                                            .foregroundStyle(.primary)
+                                        
+                                        HStack(spacing: 6) {
+                                            if item.entry.label != "パスワード" {
+                                                Text(item.entry.label)
+                                                    .font(.caption2)
+                                                    .foregroundStyle(AppTheme.accent.opacity(0.8))
+                                                    .padding(.horizontal, 6)
+                                                    .padding(.vertical, 2)
+                                                    .background(AppTheme.accent.opacity(0.1))
+                                                    .clipShape(Capsule())
+                                            }
+                                            
+                                            Text(item.username)
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+                                        }
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                    Image(systemName: "chevron.right")
+                                        .font(.caption2)
+                                        .foregroundStyle(.tertiary)
+                                }
+                                .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
                         }
-                    }
-                    
-                    if !searchText.isEmpty && filteredItems.isEmpty {
-                        ContentUnavailableView.search
+                        
+                        if !searchText.isEmpty && filteredEntries.isEmpty {
+                            ContentUnavailableView.search
+                        }
                     }
                 }
             }
-            .navigationTitle("保存済みから選ぶ")
+            .navigationTitle("保存済みパスワード")
             .navigationBarTitleDisplayMode(.inline)
             .searchable(text: $searchText, prompt: "サービス名で検索")
             .toolbar {
@@ -60,7 +115,7 @@ struct SavedPasswordPicker: View {
                 "このパスワードを使いますか？",
                 isPresented: $showConfirmation,
                 titleVisibility: .visible,
-                presenting: selectedPayload
+                presenting: selectedEntry
             ) { selected in
                 Button("フォームに適用") {
                     onSelect(selected.entry, .apply)
@@ -71,126 +126,34 @@ struct SavedPasswordPicker: View {
                     dismiss()
                 }
                 Button("キャンセル", role: .cancel) {
-                    selectedPayload = nil
+                    selectedEntry = nil
                 }
             } message: { selected in
-                Text("\(selected.title) の「\(selected.entry.label)」")
+                Text("\(selected.serviceName) の「\(selected.entry.label)」")
+            }
+            .task {
+                decryptAll()
             }
         }
     }
-}
-
-// MARK: - 各行（復号してパスワード一覧を表示）
-
-private struct SavedPasswordRow: View {
-    let item: VaultItem
-    var onTap: (String, PasswordEntry) -> Void
     
-    @State private var payload: SecretPayload?
-    @State private var isExpanded = false
-    @State private var visiblePasswords: Set<UUID> = []
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            // サービス名タップで展開
-            Button(action: {
-                if payload == nil { decrypt() }
-                withAnimation { isExpanded.toggle() }
-            }) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(item.title)
-                            .font(.headline)
-                            .foregroundStyle(.primary)
-                        if let payload = payload {
-                            Text(payload.username)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                    Spacer()
-                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                .contentShape(Rectangle())
+    /// 全VaultItemを復号してフラットなパスワード一覧を生成
+    private func decryptAll() {
+        var entries: [DecryptedEntry] = []
+        for item in items {
+            guard let decryptedData = try? EncryptionManager.shared.decrypt(item.encryptedData),
+                  let payload = try? JSONDecoder().decode(SecretPayload.self, from: decryptedData) else {
+                continue
             }
-            .buttonStyle(.plain)
-            
-            // 展開時: パスワード一覧
-            if isExpanded, let payload = payload {
-                VStack(spacing: 0) {
-                    ForEach(payload.passwords) { entry in
-                        Button(action: {
-                            onTap(item.title, entry)
-                        }) {
-                            HStack {
-                                Image(systemName: "key.fill")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                    .frame(width: 20)
-                                
-                                VStack(alignment: .leading, spacing: 1) {
-                                    if payload.passwords.count > 1 {
-                                        Text(entry.label)
-                                            .font(.caption2)
-                                            .foregroundStyle(.secondary)
-                                    }
-                                    Text(visiblePasswords.contains(entry.id) ? entry.value : maskedPassword(entry.value))
-                                        .font(.system(.caption, design: .monospaced))
-                                        .foregroundStyle(.primary)
-                                }
-                                
-                                Spacer()
-                                
-                                Button(action: {
-                                    withAnimation(.easeInOut(duration: 0.15)) {
-                                        if visiblePasswords.contains(entry.id) {
-                                            visiblePasswords.remove(entry.id)
-                                        } else {
-                                            visiblePasswords.insert(entry.id)
-                                        }
-                                    }
-                                }) {
-                                    Image(systemName: visiblePasswords.contains(entry.id) ? "eye.slash" : "eye")
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                        .frame(width: 28, height: 28)
-                                }
-                                .buttonStyle(.borderless)
-                                
-                                Image(systemName: "chevron.right")
-                                    .font(.caption2)
-                                    .foregroundStyle(.tertiary)
-                            }
-                            .padding(.vertical, 8)
-                            .padding(.leading, 8)
-                            .contentShape(Rectangle())
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
-                .padding(.top, 8)
+            for pw in payload.passwords {
+                entries.append(DecryptedEntry(
+                    serviceName: item.title,
+                    username: payload.username,
+                    entry: pw
+                ))
             }
         }
-        .task {
-            // 初回表示時は復号しない（展開時にのみ復号）
-        }
-    }
-    
-    private func decrypt() {
-        guard let decryptedData = try? EncryptionManager.shared.decrypt(item.encryptedData),
-              let decoded = try? JSONDecoder().decode(SecretPayload.self, from: decryptedData) else {
-            return
-        }
-        payload = decoded
-    }
-    
-    /// パスワードの先頭4文字を表示し、残りをマスク
-    private func maskedPassword(_ value: String) -> String {
-        let visible = min(4, value.count)
-        let prefix = String(value.prefix(visible))
-        let masked = String(repeating: "•", count: max(0, value.count - visible))
-        return prefix + masked
+        decryptedEntries = entries
+        isLoading = false
     }
 }
