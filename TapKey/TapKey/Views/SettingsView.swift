@@ -4,6 +4,7 @@ struct SettingsView: View {
     @AppStorage("clipboardClearSeconds") private var clipboardClearSeconds: Int = 30
     @AppStorage("autoLockSeconds") private var autoLockSeconds: Int = 0
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = true
+    @Environment(BiometricManager.self) private var biometricManager
     
     let clipboardOptions = [10, 15, 30, 60, 90, 120]
     let autoLockOptions = [0, 5, 15, 30, 60, 300]
@@ -14,15 +15,11 @@ struct SettingsView: View {
                 Section {
                     HStack(spacing: 14) {
                         SettingsIcon(icon: "faceid", color: Color(hex: "10B981"))
-                        Text("生体認証ロック")
-                        Spacer()
-                        Text("ON")
-                            .font(.subheadline)
-                            .foregroundStyle(.green)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 3)
-                            .background(.green.opacity(0.12))
-                            .clipShape(Capsule())
+                        Toggle("生体認証ロック", isOn: Binding(
+                            get: { biometricManager.isBiometricEnabled },
+                            set: { biometricManager.isBiometricEnabled = $0 }
+                        ))
+                        .tint(Color(hex: "10B981"))
                     }
                     
                     HStack(spacing: 14) {
@@ -57,25 +54,6 @@ struct SettingsView: View {
                     Label("クリップボード", systemImage: "doc.on.clipboard.fill")
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(Color(hex: "F59E0B"))
-                }
-                
-                Section {
-                    HStack(spacing: 14) {
-                        SettingsIcon(icon: "square.and.arrow.up", color: .secondary)
-                        Text("エクスポート / インポート")
-                            .foregroundStyle(.secondary)
-                        Spacer()
-                        Text("v1.0")
-                            .font(.caption.weight(.medium))
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 3)
-                            .background(Color.secondary.opacity(0.12))
-                            .clipShape(Capsule())
-                    }
-                } header: {
-                    Label("データ管理", systemImage: "cylinder.split.1x2.fill")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.secondary)
                 }
                 
                 Section {

@@ -64,9 +64,6 @@ struct UpgradeView: View {
                         
                         VStack(spacing: 16) {
                             PremiumFeatureRow(icon: "infinity", text: "パスワード保存 無制限", active: true)
-                            PremiumFeatureRow(icon: "rectangle.and.pencil.and.ellipsis", text: "iOS Password AutoFill", active: false)
-                            PremiumFeatureRow(icon: "number.circle", text: "TOTP 2段階認証", active: false)
-                            PremiumFeatureRow(icon: "square.and.arrow.up", text: "エクスポート / インポート", active: false)
                         }
                         .padding(.horizontal, 8)
                         

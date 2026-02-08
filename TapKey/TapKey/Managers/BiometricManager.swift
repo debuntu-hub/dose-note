@@ -7,8 +7,28 @@ class BiometricManager {
     var isLocked: Bool = true
     var errorMessage: String? = nil
     
-    // シングルトン化も検討できるが、@ObservableなのでEnvironmentで渡すか、
-    // App構造体でStateObject的に持つのが良い
+    /// 生体認証ロックの有効/無効設定（UserDefaultsで永続化）
+    var isBiometricEnabled: Bool {
+        get { UserDefaults.standard.bool(forKey: "isBiometricEnabled") }
+        set {
+            UserDefaults.standard.set(newValue, forKey: "isBiometricEnabled")
+            if !newValue {
+                // OFFにしたら即ロック解除
+                isLocked = false
+            }
+        }
+    }
+    
+    init() {
+        // 初回起動時はデフォルトON
+        if UserDefaults.standard.object(forKey: "isBiometricEnabled") == nil {
+            UserDefaults.standard.set(true, forKey: "isBiometricEnabled")
+        }
+        // 生体認証が無効ならロック解除状態で開始
+        if !isBiometricEnabled {
+            isLocked = false
+        }
+    }
     
     func unlock() {
         // キーの準備（Keychainアクセス）を試みることで認証とする
@@ -27,6 +47,8 @@ class BiometricManager {
     }
     
     func lock() {
+        // 生体認証が無効ならロックしない
+        guard isBiometricEnabled else { return }
         isLocked = true
         EncryptionManager.shared.clearKey()
     }
