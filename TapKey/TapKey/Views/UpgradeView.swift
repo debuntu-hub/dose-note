@@ -85,20 +85,12 @@ struct UpgradeView: View {
                         if let error = purchaseManager.errorMessage {
                             Text(error)
                                 .font(.caption)
-                                .foregroundStyle(.red.opacity(0.8))
+                                .multilineTextAlignment(.center)
+                                .foregroundStyle(.white.opacity(0.6))
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 8)
-                                .background(.red.opacity(0.1))
-                                .clipShape(Capsule())
-                        }
-                        
-                        // 製品情報が未取得の場合
-                        if purchaseManager.product == nil && !purchaseManager.isLoadingProduct {
-                            Button("製品情報を再取得") {
-                                Task { await purchaseManager.loadProduct() }
-                            }
-                            .font(.caption)
-                            .foregroundStyle(.white.opacity(0.6))
+                                .background(.white.opacity(0.08))
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
                         }
                         
                         if purchaseManager.isLoadingProduct {
@@ -107,37 +99,78 @@ struct UpgradeView: View {
                                 .foregroundStyle(.white.opacity(0.6))
                         }
                         
-                        let buttonDisabled = purchaseManager.isPurchasing || purchaseManager.product == nil
-                        
-                        Button(action: {
-                            Task { await purchaseManager.purchase() }
-                        }) {
-                            if purchaseManager.isPurchasing {
-                                ProgressView()
-                                    .tint(.white)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 18)
-                            } else {
-                                Text("Premium を購入")
-                                    .font(.headline)
-                                    .foregroundColor(Color(hex: "1E1B4B"))
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 18)
+                        if purchaseManager.product != nil {
+                            // 製品取得成功時: 通常の購入ボタン
+                            Button(action: {
+                                Task { await purchaseManager.purchase() }
+                            }) {
+                                if purchaseManager.isPurchasing {
+                                    ProgressView()
+                                        .tint(.white)
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.vertical, 18)
+                                } else {
+                                    Text("Premium を購入")
+                                        .font(.headline)
+                                        .foregroundColor(Color(hex: "1E1B4B"))
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.vertical, 18)
+                                }
                             }
-                        }
-                        .background(
-                            LinearGradient(
-                                colors: buttonDisabled
-                                    ? [Color.gray.opacity(0.4), Color.gray.opacity(0.3)]
-                                    : [Color(hex: "F59E0B"), Color(hex: "FBBF24")],
-                                startPoint: .leading,
-                                endPoint: .trailing
+                            .background(
+                                LinearGradient(
+                                    colors: [Color(hex: "F59E0B"), Color(hex: "FBBF24")],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
                             )
-                        )
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
-                        .shadow(color: buttonDisabled ? .clear : Color(hex: "F59E0B").opacity(0.3), radius: 12, x: 0, y: 6)
-                        .disabled(buttonDisabled)
-                        .padding(.horizontal, 8)
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                            .shadow(color: Color(hex: "F59E0B").opacity(0.3), radius: 12, x: 0, y: 6)
+                            .disabled(purchaseManager.isPurchasing)
+                            .padding(.horizontal, 8)
+                        } else if !purchaseManager.isLoadingProduct {
+                            // 製品未取得時: 再取得ボタン
+                            Button(action: {
+                                Task { await purchaseManager.loadProduct() }
+                            }) {
+                                HStack {
+                                    Image(systemName: "arrow.clockwise")
+                                    Text("製品情報を再取得")
+                                }
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 18)
+                            }
+                            .background(
+                                LinearGradient(
+                                    colors: [Color.gray.opacity(0.4), Color.gray.opacity(0.3)],
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                            .padding(.horizontal, 8)
+                            
+                            #if DEBUG
+                            // 開発テスト用: StoreKitなしでPremiumを解放
+                            Button(action: {
+                                purchaseManager.debugUnlockPremium()
+                            }) {
+                                HStack {
+                                    Image(systemName: "hammer.fill")
+                                    Text("開発用: Premiumを解放")
+                                }
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundColor(Color(hex: "1E1B4B"))
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 14)
+                            }
+                            .background(Color(hex: "10B981"))
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .padding(.horizontal, 8)
+                            #endif
+                        }
                         
                         Button("購入を復元") {
                             Task { await purchaseManager.restorePurchases() }

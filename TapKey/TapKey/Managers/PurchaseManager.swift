@@ -62,29 +62,56 @@ class PurchaseManager {
     
     // MARK: - StoreKit
     
+    /// 最大リトライ回数
+    private static let maxRetries = 3
+    
     func loadProduct() async {
         await MainActor.run {
             isLoadingProduct = true
             errorMessage = nil
         }
-        do {
-            let products = try await Product.products(for: [PurchaseManager.premiumProductID])
-            await MainActor.run {
-                self.product = products.first
-                self.isLoadingProduct = false
-                if products.isEmpty {
-                    self.errorMessage = "製品情報が見つかりませんでした"
+        
+        for attempt in 1...Self.maxRetries {
+            do {
+                let products = try await Product.products(for: [PurchaseManager.premiumProductID])
+                await MainActor.run {
+                    self.product = products.first
+                    self.isLoadingProduct = false
+                    if products.isEmpty && attempt == Self.maxRetries {
+                        self.errorMessage = "App Storeに製品が未登録です。Xcodeから実行するとStoreKit Testingが有効になります。"
+                    }
+                }
+                print("[TapKey] StoreKit products loaded (attempt \(attempt)): \(products.map { $0.id })")
+                if !products.isEmpty { return }
+            } catch {
+                print("[TapKey] StoreKit product load error (attempt \(attempt)): \(error)")
+                if attempt == Self.maxRetries {
+                    await MainActor.run {
+                        self.isLoadingProduct = false
+                        self.errorMessage = "製品情報の取得に失敗しました"
+                    }
+                    return
                 }
             }
-            print("[TapKey] StoreKit products loaded: \(products.map { $0.id })")
-        } catch {
-            await MainActor.run {
-                self.isLoadingProduct = false
-                self.errorMessage = "製品情報の取得に失敗しました: \(error.localizedDescription)"
-            }
-            print("[TapKey] StoreKit product load error: \(error)")
+            // リトライ前に少し待つ
+            try? await Task.sleep(for: .seconds(1))
         }
+        await MainActor.run { self.isLoadingProduct = false }
     }
+    
+    #if DEBUG
+    /// 開発テスト用: Premiumを有効化
+    func debugUnlockPremium() {
+        isPremium = true
+        UserDefaults.standard.set(true, forKey: "tapkey_premium_unlocked")
+    }
+    
+    /// 開発テスト用: Premiumを無効化
+    func debugLockPremium() {
+        isPremium = false
+        UserDefaults.standard.set(false, forKey: "tapkey_premium_unlocked")
+    }
+    #endif
     
     func purchase() async {
         guard let product = product else { return }
