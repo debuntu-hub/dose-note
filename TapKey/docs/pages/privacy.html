@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TapKey - プライバシーポリシー</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif;
+            background: #0F172A;
+            color: #E2E8F0;
+            line-height: 1.8;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 28px;
+            color: #818CF8;
+            margin-bottom: 8px;
+        }
+        h2 {
+            font-size: 20px;
+            color: #A5B4FC;
+            margin-top: 32px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 6px;
+        }
+        p, li {
+            font-size: 15px;
+            color: #CBD5E1;
+            margin-bottom: 12px;
+        }
+        ul { padding-left: 24px; }
+        .date {
+            font-size: 13px;
+            color: #64748B;
+            margin-bottom: 24px;
+        }
+        strong { color: #E2E8F0; }
+        a { color: #818CF8; }
+        .nav {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #334155;
+            text-align: center;
+        }
+        .nav a {
+            margin: 0 16px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>プライバシーポリシー</h1>
+        <p class="date">制定日: 2026年2月8日</p>
+        <p>本プライバシーポリシーは、<strong>TapKey</strong>（以下、「本アプリ」といいます）における利用者情報の取り扱いについて定めたものです。</p>
+
+        <h2>1. 収集する情報</h2>
+        <p>本アプリは、利用者のプライバシーを最大限尊重するため、<strong>個人情報を収集・送信しません。</strong></p>
+        <ul>
+            <li><strong>保存データ</strong>: パスワード・ユーザー名・メモなどの機密データは、AES-256-GCM方式で暗号化のうえ、すべて利用者のデバイス内（ローカルストレージ）にのみ保存されます。</li>
+            <li><strong>暗号化キー</strong>: 暗号化に使用するキーは、iOSのKeychain（Secure Enclave連携）に保存され、アプリ外への送信は一切行いません。</li>
+            <li><strong>解析データ</strong>: 開発者を含む第三者のサーバーへ、利用者のデータを自動的に送信することはありません。</li>
+            <li><strong>ネットワーク通信</strong>: 本アプリはインターネット通信を行いません。すべての処理はデバイス上で完結します。</li>
+        </ul>
+
+        <h2>2. データの利用目的</h2>
+        <p>本アプリに入力されたデータは、以下の目的でのみ利用されます。</p>
+        <ul>
+            <li>アプリ内でのパスワード保管・表示・検索のため</li>
+            <li>生体認証（Face ID / Touch ID）によるアクセス制御のため</li>
+            <li>iOSのシステム機能（StoreKit）による定期購読（サブスクリプション）の管理のため</li>
+        </ul>
+
+        <h2>3. 生体認証について</h2>
+        <p>本アプリは、端末の生体認証機能（Face ID / Touch ID）を利用してアクセスを制御します。</p>
+        <ul>
+            <li>生体認証データ（顔・指紋のデータ）は、Apple社のSecure Enclaveに保存されており、本アプリが直接アクセス・取得・保存することはありません。</li>
+            <li>本アプリは、iOSが提供する認証結果（成功/失敗）のみを受け取ります。</li>
+        </ul>
+
+        <h2>4. 外部サービスとの連携</h2>
+        <p>本アプリは、以下のApple社が提供する標準サービスを利用しています。</p>
+        <ul>
+            <li><strong>App Store / StoreKit</strong>: アプリ内課金およびサブスクリプションの管理のために利用されます。</li>
+        </ul>
+        <p>これらのサービスによるデータの取り扱いについては、Apple社のプライバシーポリシーをご参照ください。</p>
+
+        <h2>5. データの削除</h2>
+        <p>アプリを削除すると、デバイスに保存されたすべてのデータ（暗号化された保管データおよびKeychain内の暗号化キー）が削除されます。</p>
+
+        <h2>6. お問い合わせ</h2>
+        <p>本アプリに関するお問い合わせは、App StoreのサポートページまたはGitHubリポジトリよりご連絡ください。</p>
+
+        <div class="nav">
+            <a href="terms.html">利用規約</a>
+            <a href="privacy.html">プライバシーポリシー</a>
+        </div>
+    </div>
+</body>
+</html>
