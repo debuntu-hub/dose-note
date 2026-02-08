@@ -1,8 +1,8 @@
 # 📐 Software Requirement Specification (SRS)
 
 **プロジェクト**: TapKey
-**バージョン**: v0.1
-**ステータス**: 🟢 SRS_DONE
+**バージョン**: v1.0
+**ステータス**: 🟢 RELEASE（審査提出済み）
 **基準PRD**: [PRD.md](./PRD.md)
 
 ---
@@ -13,12 +13,16 @@
 ```
 アプリ起動
   ↓
-[生体認証 - Gatekeeper]
-  ↓
-[メイン画面 (生成・保存)] <---> [一覧画面 (検索・参照)]
+[生体認証ON?] --YES--> [ロック画面 (LockView)] --> 認証成功 --> [メイン画面]
+      |                                                  
+      NO                                                 
+      ↓                                                  
+[メイン画面 (生成・保存)] <---> [一覧画面 (検索・参照)] <---> [設定画面]
   │                              │
   └-> [保存完了] -> 自動遷移 ------┘
 ```
+
+> **v1.0変更**: 生体認証はデフォルトOFF。設定画面でONにした場合のみLockViewを表示。
 
 ### 1.2 画面詳細
 
@@ -49,9 +53,18 @@
     * 長押し: 詳細メニュー / 編集 / 削除。
 
 #### SC-03: 設定画面
-* 生体認証設定
-* クリップボードクリア時間設定
-* （v0.1では簡易実装）
+* 生体認証ロック ON/OFF トグル（デフォルト: OFF）
+  * ON→OFF: 即座にロック解除、KeychainキーのACLから`.biometryAny`を除去
+  * OFF→ON: KeychainキーのACLに`.biometryAny`を付与
+* クリップボードクリア時間設定（10秒〜120秒）
+* 自動ロック時間設定（即時〜5分）
+* TapKey Premium 購入 / 復元
+* バージョン情報
+
+### 1.3 非機能要件（v1.0追加）
+* **対象端末**: iPhone専用（iPad非対応）
+* **最低OS**: iOS 17+
+* **暗号化申告**: ITSAppUsesNonExemptEncryption = NO（Apple標準CryptoKitのみ使用）
 
 ---
 
@@ -74,7 +87,10 @@
 ### 2.2 暗号化仕様
 * **アルゴリズム**: AES-GCM (CryptoKit)
 * **鍵管理**: SymmetricKeyを生成し、Keychainに保存。
-* **アクセス制御**: `kSecAttrAccessControl` に `.biometryAny` (TouchID/FaceID) を指定。
+* **アクセス制御**: 
+  * 生体認証ON時: `kSecAttrAccessControl` に `.biometryAny` を指定
+  * 生体認証OFF時: `kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly` のみ（生体認証不要）
+  * トグル変更時: 既存キーを読み出し、新しいACLで再保存（`EncryptionManager.reSaveKey()`）
 
 ---
 

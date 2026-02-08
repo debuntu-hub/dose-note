@@ -58,3 +58,31 @@ tasks:
       - [x] 複数パスワード時のラベルもTextField化
       - [x] FocusState対応（password/passwordLabelケース追加）
       - [x] SRS.md SC-01に編集仕様を追記
+
+  - id: T-07
+    title: 生体認証リファクタリング
+    status: done
+    items:
+      - [x] 生体認証デフォルトOFFに変更
+      - [x] KeychainHelper.saveKeyにrequireBiometricパラメータ追加
+      - [x] EncryptionManagerにACLマイグレーション機能追加
+      - [x] BiometricManagerトグル変更時にACL自動切替
+      - [x] LockView自動FaceIDプロンプト削除（ボタン手動に変更）
+      - [x] 既存ユーザー向けマイグレーション（v1.1フラグ）
+
+  - id: T-08
+    title: App Store提出準備
+    status: done
+    items:
+      - [x] iPhone専用に変更（TARGETED_DEVICE_FAMILY=1）
+      - [x] ITSAppUsesNonExemptEncryption=NO追加
+      - [x] プライバシーポリシー作成（TapKey/docs/PRIVACY.md）
+      - [x] 利用規約作成（TapKey/docs/TERMS.md）
+      - [x] GitHub Pages用HTML作成・公開（tapkey-appリポジトリ）
+      - [x] App Store説明文・キーワード・サブタイトル作成
+      - [x] スクリーンショット撮影・アップロード
+      - [x] 年齢レーティング設定（4+）
+      - [x] 価格設定（無料 + Premium ¥980買い切り）
+      - [x] 著作権情報入力
+      - [x] コンテンツ配信権（いいえ）
+      - [x] App Store審査提出（2026年2月8日）
