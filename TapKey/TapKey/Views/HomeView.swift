@@ -229,10 +229,14 @@ struct HomeView: View {
                 SavedPasswordPicker { entry, action in
                     switch action {
                     case .apply:
-                        // 選択したパスワードをフォームの先頭に適用
-                        if let index = viewModel.passwords.indices.first {
-                            viewModel.passwords[index].value = entry.value
-                            viewModel.passwords[index].label = entry.label
+                        // パスワードが1つだけで未編集（デフォルト生成状態）なら上書き、
+                        // それ以外は新しいエントリとして追加
+                        if viewModel.passwords.count == 1,
+                           viewModel.passwords[0].label == "パスワード" {
+                            viewModel.passwords[0].value = entry.value
+                            viewModel.passwords[0].label = entry.label
+                        } else {
+                            viewModel.passwords.append(PasswordEntry(label: entry.label, value: entry.value))
                         }
                     case .copy:
                         ClipboardManager.shared.copy(entry.value)
