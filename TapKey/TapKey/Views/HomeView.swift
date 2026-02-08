@@ -10,8 +10,10 @@ struct HomeView: View {
     @FocusState private var focusedField: Field?
     var switchToVault: (() -> Void)?
     
-    enum Field {
+    enum Field: Hashable {
         case serviceName, username, note
+        case password(Int)
+        case passwordLabel(Int)
     }
     
     var body: some View {
@@ -28,9 +30,10 @@ struct HomeView: View {
                             VStack(alignment: .leading, spacing: 4) {
                                 if viewModel.passwords.count > 1 {
                                     HStack {
-                                        Text(entry.label)
+                                        TextField("ラベル", text: $viewModel.passwords[index].label)
                                             .font(.caption2)
                                             .foregroundStyle(.secondary)
+                                            .focused($focusedField, equals: .passwordLabel(index))
                                         Spacer()
                                         if viewModel.passwords.count > 1 {
                                             Button(action: {
@@ -45,11 +48,14 @@ struct HomeView: View {
                                 }
                                 
                                 HStack {
-                                    Text(entry.value)
+                                    TextField("パスワード", text: $viewModel.passwords[index].value)
                                         .font(.system(.title3, design: .monospaced))
                                         .fontWeight(.semibold)
                                         .lineLimit(1)
                                         .minimumScaleFactor(0.5)
+                                        .autocorrectionDisabled()
+                                        .textInputAutocapitalization(.never)
+                                        .focused($focusedField, equals: .password(index))
                                     
                                     Spacer()
                                     
@@ -254,6 +260,8 @@ struct HomeView: View {
                 focusedField = .note
             case .note:
                 focusedField = nil
+            case .password, .passwordLabel:
+                focusedField = .serviceName
             case .none:
                 break
             }
