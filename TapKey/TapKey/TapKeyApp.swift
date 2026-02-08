@@ -36,7 +36,7 @@ struct TapKeyApp: App {
                     ContentView()
                         .environment(biometricManager)
                     
-                    if biometricManager.isLocked {
+                    if biometricManager.isBiometricEnabled && biometricManager.isLocked {
                         LockView(manager: biometricManager)
                             .transition(.opacity)
                             .zIndex(100)

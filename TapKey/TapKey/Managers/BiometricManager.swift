@@ -31,6 +31,13 @@ class BiometricManager {
     }
     
     func unlock() {
+        // 生体認証がOFFなら即解除（Keychain認証をスキップ）
+        guard isBiometricEnabled else {
+            self.isLocked = false
+            self.errorMessage = nil
+            return
+        }
+        
         // キーの準備（Keychainアクセス）を試みることで認証とする
         // EncryptionManagerがKeychainにアクセスする際、アクセス制御によりFaceID/TouchIDが求められる
         do {
