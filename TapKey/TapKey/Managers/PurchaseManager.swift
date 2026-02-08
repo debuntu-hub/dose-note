@@ -22,6 +22,9 @@ class PurchaseManager {
     /// 購入中フラグ
     var isPurchasing: Bool = false
     
+    /// 製品情報読み込み中
+    var isLoadingProduct: Bool = false
+    
     /// エラーメッセージ
     var errorMessage: String?
     
@@ -60,15 +63,26 @@ class PurchaseManager {
     // MARK: - StoreKit
     
     func loadProduct() async {
+        await MainActor.run {
+            isLoadingProduct = true
+            errorMessage = nil
+        }
         do {
             let products = try await Product.products(for: [PurchaseManager.premiumProductID])
             await MainActor.run {
                 self.product = products.first
+                self.isLoadingProduct = false
+                if products.isEmpty {
+                    self.errorMessage = "製品情報が見つかりませんでした"
+                }
             }
+            print("[TapKey] StoreKit products loaded: \(products.map { $0.id })")
         } catch {
             await MainActor.run {
-                self.errorMessage = "製品情報の取得に失敗しました"
+                self.isLoadingProduct = false
+                self.errorMessage = "製品情報の取得に失敗しました: \(error.localizedDescription)"
             }
+            print("[TapKey] StoreKit product load error: \(error)")
         }
     }
     

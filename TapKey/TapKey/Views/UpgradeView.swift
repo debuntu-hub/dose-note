@@ -81,6 +81,34 @@ struct UpgradeView: View {
                             }
                         }
                         
+                        // エラー表示
+                        if let error = purchaseManager.errorMessage {
+                            Text(error)
+                                .font(.caption)
+                                .foregroundStyle(.red.opacity(0.8))
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 8)
+                                .background(.red.opacity(0.1))
+                                .clipShape(Capsule())
+                        }
+                        
+                        // 製品情報が未取得の場合
+                        if purchaseManager.product == nil && !purchaseManager.isLoadingProduct {
+                            Button("製品情報を再取得") {
+                                Task { await purchaseManager.loadProduct() }
+                            }
+                            .font(.caption)
+                            .foregroundStyle(.white.opacity(0.6))
+                        }
+                        
+                        if purchaseManager.isLoadingProduct {
+                            ProgressView("製品情報を読み込み中...")
+                                .tint(.white)
+                                .foregroundStyle(.white.opacity(0.6))
+                        }
+                        
+                        let buttonDisabled = purchaseManager.isPurchasing || purchaseManager.product == nil
+                        
                         Button(action: {
                             Task { await purchaseManager.purchase() }
                         }) {
@@ -99,14 +127,16 @@ struct UpgradeView: View {
                         }
                         .background(
                             LinearGradient(
-                                colors: [Color(hex: "F59E0B"), Color(hex: "FBBF24")],
+                                colors: buttonDisabled
+                                    ? [Color.gray.opacity(0.4), Color.gray.opacity(0.3)]
+                                    : [Color(hex: "F59E0B"), Color(hex: "FBBF24")],
                                 startPoint: .leading,
                                 endPoint: .trailing
                             )
                         )
                         .clipShape(RoundedRectangle(cornerRadius: 16))
-                        .shadow(color: Color(hex: "F59E0B").opacity(0.3), radius: 12, x: 0, y: 6)
-                        .disabled(purchaseManager.isPurchasing || purchaseManager.product == nil)
+                        .shadow(color: buttonDisabled ? .clear : Color(hex: "F59E0B").opacity(0.3), radius: 12, x: 0, y: 6)
+                        .disabled(buttonDisabled)
                         .padding(.horizontal, 8)
                         
                         Button("購入を復元") {
@@ -131,7 +161,13 @@ struct UpgradeView: View {
             .onChange(of: purchaseManager.isPremium) { _, newValue in
                 if newValue { dismiss() }
             }
-            .onAppear { isAnimating = true }
+            .onAppear {
+                isAnimating = true
+                // 製品情報が未取得なら再読み込み
+                if purchaseManager.product == nil {
+                    Task { await purchaseManager.loadProduct() }
+                }
+            }
         }
     }
 }
