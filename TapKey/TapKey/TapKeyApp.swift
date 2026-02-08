@@ -52,12 +52,11 @@ struct TapKeyApp: App {
                 biometricManager.lock()
                 ClipboardManager.shared.clearNow()
             case .inactive:
-                // アプリスイッチャー表示中などは画面を隠すためにロック状態へ
-                // ただし、バックグラウンドではないのでクリップボードクリアまではしないかもしれないが
-                // 安全側に倒してロックはする
-                biometricManager.lock()
+                // FaceID/TouchIDダイアログ表示時もinactiveになるため、
+                // ここでlock()すると認証が2重に要求されるバグが発生する。
+                // ロックはbackground遷移時のみとする。
+                break
             case .active:
-                // 復帰時に自動認証を試みる処理はLockView.onAppearで行う
                 break
             @unknown default:
                 break
