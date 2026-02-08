@@ -18,6 +18,15 @@
 
 ## 2026年2月
 
+### 2026-02-08
+
+- `[SRS]` TapKey: 生成画面（SC-01）にパスワード編集仕様を追記
+  - 生成されたパスワードをTextFieldで直接手動編集可能に
+  - 複数パスワード時のラベル編集機能
+  - autocorrectionDisabled / textInputAutocapitalization設定
+  - HomeView.swift: Text→TextField変更、FocusState拡張
+  - SRS.md, TASKS.yaml, CEO_DASHBOARD.md 同期更新
+
 ### 2026-02-07
 
 - `[実装]` TapKey仕様書v0.1に基づく不足機能の一括実装

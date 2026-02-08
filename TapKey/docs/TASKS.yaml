@@ -49,3 +49,12 @@ tasks:
       - [x] エッジケース動作確認 (GATE_C_VERIFICATION.md)
       - [x] UI調整・Haptics追加 (HomeView, DetailView等で実装済)
       - [x] アプリアイコン設定 (スクリプト生成済)
+
+  - id: T-06
+    title: パスワード編集機能
+    status: done
+    items:
+      - [x] 生成画面のパスワード表示をTextFieldに変更（直接編集可能）
+      - [x] 複数パスワード時のラベルもTextField化
+      - [x] FocusState対応（password/passwordLabelケース追加）
+      - [x] SRS.md SC-01に編集仕様を追記
