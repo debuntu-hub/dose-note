@@ -100,14 +100,21 @@ class PurchaseManager {
     }
     
     #if DEBUG
+    /// DEBUGフラグ: trueの場合checkPurchaseHistoryをスキップ
+    private var debugSkipEntitlementCheck: Bool = UserDefaults.standard.bool(forKey: "tapkey_debug_skip_entitlement")
+    
     /// 開発テスト用: Premiumを有効化
     func debugUnlockPremium() {
+        debugSkipEntitlementCheck = false
+        UserDefaults.standard.set(false, forKey: "tapkey_debug_skip_entitlement")
         isPremium = true
         UserDefaults.standard.set(true, forKey: "tapkey_premium_unlocked")
     }
     
-    /// 開発テスト用: Premiumを無効化
+    /// 開発テスト用: Premiumを無効化（再起動後も維持）
     func debugLockPremium() {
+        debugSkipEntitlementCheck = true
+        UserDefaults.standard.set(true, forKey: "tapkey_debug_skip_entitlement")
         isPremium = false
         UserDefaults.standard.set(false, forKey: "tapkey_premium_unlocked")
     }
@@ -151,6 +158,12 @@ class PurchaseManager {
     // MARK: - Private
     
     private func checkPurchaseHistory() async {
+        #if DEBUG
+        if debugSkipEntitlementCheck {
+            print("[TapKey] DEBUG: entitlement check skipped")
+            return
+        }
+        #endif
         for await result in Transaction.currentEntitlements {
             if case .verified(let transaction) = result {
                 if transaction.productID == PurchaseManager.premiumProductID {

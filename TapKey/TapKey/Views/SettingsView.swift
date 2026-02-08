@@ -78,6 +78,43 @@ struct SettingsView: View {
                         }
                     }
                 }
+                
+                #if DEBUG
+                Section {
+                    HStack {
+                        Text("Premium状態")
+                        Spacer()
+                        Text(PurchaseManager.shared.isPremium ? "✅ 有効" : "❌ 無効")
+                            .foregroundStyle(PurchaseManager.shared.isPremium ? .green : .red)
+                    }
+                    
+                    if PurchaseManager.shared.isPremium {
+                        Button(action: {
+                            PurchaseManager.shared.debugLockPremium()
+                        }) {
+                            HStack(spacing: 14) {
+                                SettingsIcon(icon: "lock.fill", color: .red)
+                                Text("Premiumを無効化")
+                                    .foregroundStyle(.red)
+                            }
+                        }
+                    } else {
+                        Button(action: {
+                            PurchaseManager.shared.debugUnlockPremium()
+                        }) {
+                            HStack(spacing: 14) {
+                                SettingsIcon(icon: "lock.open.fill", color: .green)
+                                Text("Premiumを有効化")
+                                    .foregroundStyle(.green)
+                            }
+                        }
+                    }
+                } header: {
+                    Label("開発テスト", systemImage: "hammer.fill")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.orange)
+                }
+                #endif
             }
             .listStyle(.insetGrouped)
             .navigationTitle("設定")
