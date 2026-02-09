@@ -78,9 +78,10 @@ final class DoseStore: ObservableObject {
         calculatePaceIncludingNow(for: doses)
     }
 
-    /// Calculates the average pace: (Now - FirstDose) / Count
+    /// Calculates the average interval: (Now - FirstDose) / (Count - 1)
     private func calculatePaceIncludingNow(for targetDoses: [Dose]) -> Double? {
-        guard !targetDoses.isEmpty else { return nil }
+        // Need at least 2 doses to calculate an interval
+        guard targetDoses.count >= 2 else { return nil }
         
         // Data must be sorted oldest first for time calculation
         let sortedDoses = targetDoses.sorted(by: { $0.date < $1.date })
@@ -89,10 +90,10 @@ final class DoseStore: ObservableObject {
         let now = Date()
         let totalDuration = max(0, now.timeIntervalSince(firstDose.date))
         
-        let count = Double(targetDoses.count)
+        let intervals = Double(targetDoses.count - 1)
         
-        // Formula: Total duration since first dose / Number of doses
-        let averageSeconds = totalDuration / count
+        // Formula: Total duration since first dose / Number of intervals
+        let averageSeconds = totalDuration / intervals
         
         return averageSeconds / (60 * 60 * 24) // Convert seconds to days
     }
