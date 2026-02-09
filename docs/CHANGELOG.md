@@ -18,6 +18,14 @@
 
 ## 2026年2月
 
+### 2026-02-09
+
+- `[手戻り]` Dose Note: App Store審査リジェクト（Guideline 2.1 - IAP未提出）
+  - 原因: アプリ内課金（Monthly/Yearly）が審査に提出されていなかった
+  - 分類: 手順漏れ（App Store Connect上のIAP提出設定）
+  - コード変更: 不要
+  - 対応: App ReviewスクリーンショットをIAPに添付し、IAP込みで再提出
+
 ### 2026-02-08
 
 - `[SRS]` TapKey: 生成画面（SC-01）にパスワード編集仕様を追記
