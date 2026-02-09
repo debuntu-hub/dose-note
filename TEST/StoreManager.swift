@@ -20,8 +20,8 @@ class StoreManager: ObservableObject {
     init() {
         // Initialize with your product IDs
         self.productDict = [
-            "premium_monthly": "com.tomokiyoshuuwa.TEST.premium.monthly",
-            "premium_yearly": "com.tomokiyoshuuwa.TEST.premium.yearly"
+            "premium_monthly": "com.tomokiyoshuuwa.dosenote.premium.monthly",
+            "premium_yearly": "com.tomokiyoshuuwa.dosenote.premium.yearly"
         ]
         
         // Start a transaction listener as close to app launch as possible
