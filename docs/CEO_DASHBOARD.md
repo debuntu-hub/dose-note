@@ -7,7 +7,7 @@
 
 | プロジェクト | フェーズ | 状態 |
 |---|---|---|
-| **Dose Note** | RELEASE | ❌ 審査リジェクト（IAP未提出） |
+| **Dose Note** | RELEASE | ✅ 審査再提出済み（IAP修正） |
 | **TapKey** | RELEASE | ✅ App Store審査提出済み |
 | **会社OS** | OPS | 銀行API連携完了 |
 
@@ -22,19 +22,16 @@
   - OKなら → 本番申請
   - NGなら → Sunabarで継続開発（推奨） or 開業検討
 
-### 2. 🚨【Dose Note】審査リジェクト対応（Guideline 2.1 - IAP未提出）
+### 2. ✅【Dose Note】審査リジェクト対応完了（Guideline 2.1 - IAP未提出）
 - **リジェクト日**: 2026年2月8日
-- **原因**: アプリ内課金（サブスクリプション）が審査に提出されていない
-- **レビューデバイス**: iPad Air 11-inch (M3) / iPhone 17 Pro Max
-
-**対応手順（CEO作業 - App Store Connect）**:
-- [ ] ① サブスクリプション画面を開き、Monthly / Yearly の設定を確認
-- [ ] ② 各IAPに **App Reviewスクリーンショット**（Paywall画面）を添付
-- [ ] ③ 各IAPのステータスが「送信準備完了」であることを確認
-- [ ] ④ 新しいバイナリをアーカイブしてアップロード
-- [ ] ⑤ IAPを含めて審査に再提出
-
-> ⚠️ コード変更は不要。App Store Connect上でのIAP提出設定の問題。
+- **対応完了**: 2026年2月9日
+- **原因**: アプリ内課金（サブスクリプション）が審査に提出されていなかった
+- **修正内容**:
+  - [x] プロダクトIDをdosenote名前空間に変更
+  - [x] App Store Connectでサブスクリプション作成（Monthly / Yearly）
+  - [x] App Reviewスクリーンショット添付
+  - [x] 新バイナリアーカイブ・審査再提出
+  - [x] 平均服用間隔の計算式修正（分母をcount-1に）
 
 ### 3. 【TapKey】ストア申請準備
 - [x] App Store Connect でアプリ登録
@@ -62,7 +59,7 @@
 
 ## 🎉 最近の完了事項 (Archive)
 
-- **2026-02-09**: Dose Note 審査リジェクト（Guideline 2.1: IAP未提出）→ 再提出対応中
+- **2026-02-09**: Dose Note 審査リジェクト対応完了・IAP修正・審査再提出
 - **2026-02-08**: TapKey v1.0 App Store審査提出
 - **2026-02-08**: TapKey プライバシーポリシー・サポートページ公開（GitHub Pages）
 - **2026-02-08**: TapKey 生体認証デフォルトOFF・ACL動的切替実装
